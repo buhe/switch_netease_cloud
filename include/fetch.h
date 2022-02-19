@@ -1,1 +1,1 @@
-void fetch_song(const char *name);
+void fetch_songs_by_playlist(const char *name);

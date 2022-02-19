@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         {
             mkdir("/song", 0700);
         }
-        fetch_song("1");
+        fetch_songs_by_playlist("1");
         printf("Done.\n");
     }
 

@@ -1,33 +1,38 @@
 #include <curl/curl.h>
+char* get_url(char *id) {
+    return id;
+}
 
-void fetch_song(const char *name)
+void fetch_song() {
+
+}
+void fetch_songs_by_playlist(const char *name)
 {
     CURL *curl;
-        CURLcode res;
+    CURLcode res;
 
-        printf("curl init\n");
-        curl_global_init(CURL_GLOBAL_DEFAULT);
+    printf("curl init\n");
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 
-        curl = curl_easy_init();
-        if (curl)
-        {
-            curl_easy_setopt(curl, CURLOPT_URL, "https://baidu.com/");
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
-            // Add any other options here.
+    curl = curl_easy_init();
+    if (curl)
+    {
+        curl_easy_setopt(curl, CURLOPT_URL, "https://baidu.com/");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+        // Add any other options here.
 
-            printf("curl_easy_perform\n");
-            consoleUpdate(NULL);
+        printf("curl_easy_perform\n");
 
-            res = curl_easy_perform(curl);
-            if (res != CURLE_OK)
-                printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 
-            // curl_easy_recv(res);
-            // In an actual app you should return an error on failure, following cleanup.
+        // curl_easy_recv(res);
+        // In an actual app you should return an error on failure, following cleanup.
 
-            printf("cleanup\n");
-            curl_easy_cleanup(curl);
-        }
+        printf("cleanup\n");
+        curl_easy_cleanup(curl);
+    }
 
-        curl_global_cleanup();
+    curl_global_cleanup();
 }
