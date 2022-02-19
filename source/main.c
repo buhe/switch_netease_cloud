@@ -28,12 +28,19 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Dir-listing for '':\n");
-        while ((ent = readdir(dir)))
+        // printf("Dir-listing for '':\n");
+        // while ((ent = readdir(dir)))
+        // {
+        //     printf("d_name: %s\n", ent->d_name);
+        // }
+        // closedir(dir);
+        // printf("Done.\n");
+        struct stat st = {0};
+
+        if (stat("/song", &st) == -1)
         {
-            printf("d_name: %s\n", ent->d_name);
+            mkdir("/song", 0700);
         }
-        closedir(dir);
         printf("Done.\n");
     }
 
