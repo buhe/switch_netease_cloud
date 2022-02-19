@@ -21,7 +21,7 @@ void network_request(void)
     curl = curl_easy_init();
     if (curl)
     {
-        curl_easy_setopt(curl, CURLOPT_URL, "https://example.com/");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://baidu.com/");
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
         // Add any other options here.
 
@@ -31,7 +31,8 @@ void network_request(void)
         res = curl_easy_perform(curl);
         if (res != CURLE_OK)
             printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-
+        
+        // curl_easy_recv(res);
         // In an actual app you should return an error on failure, following cleanup.
 
         printf("cleanup\n");
