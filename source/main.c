@@ -3,6 +3,7 @@
 #include <dirent.h>
 
 #include <switch.h>
+#include "fetch.h"
 
 // The SD card is automatically mounted as the default device, usable with standard stdio. SD root dir is located at "/" (also "sdmc:/" but normally using the latter isn't needed).
 // The default current-working-directory when using relative paths is normally the directory where your application is located on the SD card.
@@ -41,6 +42,7 @@ int main(int argc, char **argv)
         {
             mkdir("/song", 0700);
         }
+        fetch_song("1");
         printf("Done.\n");
     }
 

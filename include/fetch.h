@@ -1,0 +1,1 @@
+void fetch_song(const char *name);
