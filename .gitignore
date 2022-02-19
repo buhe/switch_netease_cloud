@@ -52,3 +52,6 @@ Mkfile.old
 dkms.conf
 build
 hello_switch.lst
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
