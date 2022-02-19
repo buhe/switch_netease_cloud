@@ -66,6 +66,7 @@ int main() {
     // If wou would like to show with a "fade in" from black-screen to the UI, use instead ->ShowWithFadeIn();
     main->Show();
 
+    network_request();
     // Exit homebrew (Plutonium will handle all disposing of UI and renderer/application, don't worry!
 
     return 0;
