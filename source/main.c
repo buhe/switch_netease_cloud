@@ -1,15 +1,25 @@
-#include <string.h>
+// Include the most common headers from the C standard library
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
 
+// Include the main libnx system header, for Switch development
 #include <switch.h>
+
 #include "fetch.h"
 
-// The SD card is automatically mounted as the default device, usable with standard stdio. SD root dir is located at "/" (also "sdmc:/" but normally using the latter isn't needed).
-// The default current-working-directory when using relative paths is normally the directory where your application is located on the SD card.
+// This example shows how to use libcurl. For more examples, see the official examples: https://curl.haxx.se/libcurl/c/example.html
 
-int main(int argc, char **argv)
+
+// Main program entrypoint
+int main(int argc, char *argv[])
 {
+    // This example uses a text console, as a simple way to output text to the screen.
+    // If you want to write a software-rendered graphics application,
+    //   take a look at the graphics/simplegfx example, which uses the libnx Framebuffer API instead.
+    // If on the other hand you want to write an OpenGL based application,
+    //   take a look at the graphics/opengl set of examples, which uses EGL instead.
     consoleInit(NULL);
 
     // Configure our supported input layout: a single player with standard controller styles
@@ -19,32 +29,17 @@ int main(int argc, char **argv)
     PadState pad;
     padInitializeDefault(&pad);
 
-    DIR *dir;
-    struct dirent *ent;
+    socketInitializeDefault();
+    struct stat st = {0};
 
-    dir = opendir(""); // Open current-working-directory.
-    if (dir == NULL)
+    if (stat("/song", &st) == -1)
     {
-        printf("Failed to open dir.\n");
+        mkdir("/song", 0700);
     }
-    else
-    {
-        // printf("Dir-listing for '':\n");
-        // while ((ent = readdir(dir)))
-        // {
-        //     printf("d_name: %s\n", ent->d_name);
-        // }
-        // closedir(dir);
-        // printf("Done.\n");
-        struct stat st = {0};
+    printf("curl example\n");
 
-        if (stat("/song", &st) == -1)
-        {
-            mkdir("/song", 0700);
-        }
-        fetch_songs_by_playlist("1");
-        printf("Done.\n");
-    }
+    // network_request();
+    fetch_songs_by_playlist("1");
 
     // Main loop
     while (appletMainLoop())
@@ -52,15 +47,21 @@ int main(int argc, char **argv)
         // Scan the gamepad. This should be done once for each frame
         padUpdate(&pad);
 
-        // padGetButtonsDown returns the set of buttons that have been newly pressed in this frame compared to the previous one
+        // padGetButtonsDown returns the set of buttons that have been
+        // newly pressed in this frame compared to the previous one
         u64 kDown = padGetButtonsDown(&pad);
 
         if (kDown & HidNpadButton_Plus)
             break; // break in order to return to hbmenu
 
+        // Your code goes here
+
+        // Update the console, sending a new frame to the display
         consoleUpdate(NULL);
     }
 
+    socketExit();
+    // Deinitialize and clean up resources used by the console (important!)
     consoleExit(NULL);
     return 0;
 }

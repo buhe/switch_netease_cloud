@@ -1,4 +1,7 @@
 #include <curl/curl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <json-c/json.h>
 char* get_url(char *id) {
     return id;
