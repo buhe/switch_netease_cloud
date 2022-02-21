@@ -1,4 +1,4 @@
-## hello switch
+## Nintendo Switch Netease cloud
 1. crack ns
 2. setup dev tools
 ```
