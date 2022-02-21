@@ -23,5 +23,6 @@ sudo dkp-pacman -S switch-libjson-c
 - play or pause.
 
 ### UI
-- cli?
+- cli ?
 - pure sdl2
+- plutnium ?
