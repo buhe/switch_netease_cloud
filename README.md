@@ -24,3 +24,4 @@ sudo dkp-pacman -S switch-libjson-c
 
 ### UI
 - cli?
+- pure sdl2
