@@ -6,7 +6,7 @@
 
 #define RESPONSE_BODY_SIZE 128
 
-static size_t function_pt(void *ptr, size_t size, size_t nmemb, void *stream)
+static size_t next(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
@@ -24,7 +24,7 @@ static size_t function_pt(void *ptr, size_t size, size_t nmemb, void *stream)
     memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
-void requst(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
+void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
 {
     CURL *curl;
     CURLcode res;
@@ -105,7 +105,7 @@ void fetch_songs_by_playlist(const char *name)
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    requst("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", function_pt);
+    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", next);
 
     // fetch_song("https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3");
 
