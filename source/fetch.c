@@ -16,7 +16,8 @@ static size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(parsed_json, "data", &data);
     struct json_object *key;
     json_object_object_get_ex(data, "unikey", &key);
-    printf("key: %s\n", json_object_get_string(key));
+    char *str_key = json_object_get_string(key);
+    printf("key: %s\n", str_key);
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)

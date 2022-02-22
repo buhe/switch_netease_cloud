@@ -26,3 +26,18 @@ sudo dkp-pacman -S switch-libjson-c
 - cli ?
 - pure sdl2
 - plutnium ?
+
+### Debug
+
+```bash
+https://netease-cloud-music-api-theta-steel.vercel.app/user/playlist?uid=68277534
+```
+
+
+```bash
+https://netease-cloud-music-api-theta-steel.vercel.app/playlist/detail?id=72614739
+```
+
+```bash
+https://netease-cloud-music-api-theta-steel.vercel.app/song/url?id=1915875397
+```
