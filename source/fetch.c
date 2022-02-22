@@ -4,9 +4,38 @@
 #include <string.h>
 #include <json-c/json.h>
 
-#define RESPONSE_BODY_SIZE 128
+#include "fetch.h"
 
-static size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
+#define RESPONSE_BODY_SIZE 128
+#define BASE_URL "https://netease-cloud-music-api-theta-steel.vercel.app"
+
+size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    // printf(">>%s", ptr);
+    char *response_body = (char *)ptr;
+    struct json_object *parsed_json;
+    parsed_json = json_tokener_parse(response_body);
+    struct json_object *data;
+    json_object_object_get_ex(parsed_json, "data", &data);
+    struct json_object *qrimg;
+    json_object_object_get_ex(data, "qrimg", &qrimg);
+    const char *str_qrimg = json_object_get_string(qrimg);
+    printf("qrimg: %s\n", str_qrimg);
+
+    free(parsed_json);
+    free(data);
+    free(qrimg);
+    uint32_t response_body_len = strlen(response_body);
+    uint32_t len = size * nmemb;
+    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    {
+        len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    }
+    memcpy(response_body + response_body_len, ptr, len);
+    return size * nmemb;
+}
+
+size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
@@ -16,8 +45,24 @@ static size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(parsed_json, "data", &data);
     struct json_object *key;
     json_object_object_get_ex(data, "unikey", &key);
-    char *str_key = json_object_get_string(key);
+    const char *str_key = json_object_get_string(key);
     printf("key: %s\n", str_key);
+
+    char *s1 = BASE_URL;
+    char *s2 = "/login/qr/create?key=";
+    const char *s3 = str_key;
+    char *s4 = "&qrimg=true";
+    char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + strlen(s4) + 1); // +1 for the null-terminator
+    strcpy(s, s1);
+    strcat(s, s2);
+    strcat(s, s3);
+    strcat(s, s4);
+    request(s, create_qr);
+    free(parsed_json);
+    free(s);
+    free(data);
+    free(key);
+
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
@@ -29,6 +74,7 @@ static size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
 }
 void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
 {
+    printf("url: %s\n", url);
     CURL *curl;
     CURLcode res;
     curl = curl_easy_init();
@@ -102,15 +148,22 @@ void fetch_song(char *url)
         curl_easy_cleanup(curl);
     }
 }
+
+void login() {
+    // get key
+    char *s1 = BASE_URL;
+    char *s2 = "/login/qr/key";
+    char *s = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    strcpy(s, s1);
+    strcat(s, s2);
+
+    request(s, get_key);
+    free(s);
+    // create qr
+    // get cookie, call check api
+    // save cookie
+}
+
 void fetch_songs_by_playlist(const char *name)
 {
-
-    printf("curl init\n");
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-
-    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key);
-
-    // fetch_song("https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3");
-
-    curl_global_cleanup();
 }

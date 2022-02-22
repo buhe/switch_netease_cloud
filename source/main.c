@@ -6,6 +6,7 @@
 
 // Include the main libnx system header, for Switch development
 #include <switch.h>
+#include <curl/curl.h>
 
 #include "fetch.h"
 
@@ -36,11 +37,13 @@ int main(int argc, char *argv[])
     {
         mkdir("/song", 0700);
     }
-    printf("curl example\n");
 
     // network_request();
-    fetch_songs_by_playlist("1");
-
+    // fetch_songs_by_playlist("1");
+    printf("curl init\n");
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    login();
+    curl_global_cleanup();
     // Main loop
     while (appletMainLoop())
     {
