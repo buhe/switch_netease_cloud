@@ -3,7 +3,58 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json-c/json.h>
-char* get_url(char *id) {
+
+#define RESPONSE_BODY_SIZE 128
+
+static size_t function_pt(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    // printf(">>%s", ptr);
+    char *response_body = (char *)ptr;
+    struct json_object *parsed_json;
+    parsed_json = json_tokener_parse(response_body);
+    struct json_object *code;
+    json_object_object_get_ex(parsed_json, "code", &code);
+    printf("code: %d\n", json_object_get_int(code));
+    uint32_t response_body_len = strlen(response_body);
+    uint32_t len = size * nmemb;
+    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    {
+        len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    }
+    memcpy(response_body + response_body_len, ptr, len);
+    return size * nmemb;
+}
+void requst(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
+{
+    CURL *curl;
+    CURLcode res;
+    curl = curl_easy_init();
+    if (curl == NULL)
+    {
+        return ;
+    }
+
+    // char *jsonObj = "{ \"name\" : \"Pedro\" , \"age\" : \"22\" }";
+
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Accept: application/json");
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "charset: utf-8");
+
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+
+    // curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(payload));
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+        printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    curl_easy_cleanup(curl);
+}
+char *get_url(char *id)
+{
     return id;
 }
 
@@ -50,12 +101,13 @@ void fetch_song(char *url)
 }
 void fetch_songs_by_playlist(const char *name)
 {
-  
 
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    fetch_song("https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3");
+    requst("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", function_pt);
+
+    // fetch_song("https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3");
 
     curl_global_cleanup();
 }
