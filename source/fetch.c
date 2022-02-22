@@ -6,15 +6,17 @@
 
 #define RESPONSE_BODY_SIZE 128
 
-static size_t next(void *ptr, size_t size, size_t nmemb, void *stream)
+static size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(response_body);
-    struct json_object *code;
-    json_object_object_get_ex(parsed_json, "code", &code);
-    printf("code: %d\n", json_object_get_int(code));
+    struct json_object *data;
+    json_object_object_get_ex(parsed_json, "data", &data);
+    struct json_object *key;
+    json_object_object_get_ex(data, "unikey", &key);
+    printf("key: %s\n", json_object_get_string(key));
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
@@ -105,7 +107,7 @@ void fetch_songs_by_playlist(const char *name)
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", next);
+    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key);
 
     // fetch_song("https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3");
 
