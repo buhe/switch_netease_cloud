@@ -5,10 +5,11 @@
 #include <json-c/json.h>
 
 #include "fetch.h"
+#include "base64.h"
 
 #define RESPONSE_BODY_SIZE 128
 #define BASE_URL "https://netease-cloud-music-api-theta-steel.vercel.app"
-char *qr_res;
+static char *qr_res = NULL;
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
@@ -32,7 +33,9 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(data, "qrimg", &qrimg);
     const char *str_qrimg = json_object_get_string(qrimg);
     printf("qrimg: %s\n", str_qrimg);
-
+    if (qrimg != NULL) {
+        
+    }
     free(parsed_json);
     free(data);
     free(qrimg);
