@@ -13,8 +13,19 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
+    char *s;
+    if (qr_res == NULL){
+        s = malloc(strlen(response_body) + 1);
+        strcpy(s, response_body);
+    } else {
+        s = malloc(strlen(qr_res) + strlen(response_body) + 1);
+        strcpy(s, qr_res);
+        strcat(s, response_body);
+    } 
+    qr_res = s;
+    // free(s);
     struct json_object *parsed_json;
-    parsed_json = json_tokener_parse(response_body);
+    parsed_json = json_tokener_parse(qr_res);
     struct json_object *data;
     json_object_object_get_ex(parsed_json, "data", &data);
     struct json_object *qrimg;
