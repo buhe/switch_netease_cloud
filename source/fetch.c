@@ -32,9 +32,18 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     struct json_object *qrimg;
     json_object_object_get_ex(data, "qrimg", &qrimg);
     const char *str_qrimg = json_object_get_string(qrimg);
-    printf("qrimg: %s\n", str_qrimg);
-    if (qrimg != NULL) {
-        
+    // printf("qrimg: %s\n", str_qrimg);
+    
+    if (str_qrimg != NULL) {
+        char *result = NULL;
+        result = replaceWord(str_qrimg, "data:image/png;base64,", "");
+        printf("decode qrimg: %s\n", result);
+        char *name = "/song/qr.png";
+        FILE *file = fopen(name, "wb");
+        size_t output_length;
+        char *png_data = base64_decode(result, strlen(result), &output_length);
+        fwrite(png_data, 1, output_length, file);
+        fclose(file);
     }
     free(parsed_json);
     free(data);
