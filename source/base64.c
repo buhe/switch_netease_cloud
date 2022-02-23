@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 char *replaceWord(const char *s, const char *oldW,
-                  const char *newW)
+                      const char *newW)
 {
     char *result;
     int i, cnt = 0;

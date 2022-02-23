@@ -41,7 +41,7 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
         size_t output_length;
-        char *png_data = base64_decode(result, strlen(result), &output_length);
+        unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
         fwrite(png_data, 1, output_length, file);
         fclose(file);
     }
