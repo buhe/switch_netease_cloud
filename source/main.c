@@ -8,10 +8,28 @@
 #include <switch.h>
 #include <curl/curl.h>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
 #include "fetch.h"
 
-// This example shows how to use libcurl. For more examples, see the official examples: https://curl.haxx.se/libcurl/c/example.html
+#define SCREEN_W 1280
+#define SCREEN_H 720
 
+// some switch buttons
+#define JOY_A 0
+#define JOY_B 1
+#define JOY_X 2
+#define JOY_Y 3
+#define JOY_PLUS 10
+#define JOY_MINUS 11
+#define JOY_LEFT 12
+#define JOY_UP 13
+#define JOY_RIGHT 14
+#define JOY_DOWN 15
+
+extern int display_qr;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
