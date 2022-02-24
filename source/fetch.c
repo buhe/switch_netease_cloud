@@ -2,19 +2,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <json-c/json.h>
+#define _OPEN_SYS_ITOA_EXT
+
 
 #include "fetch.h"
 #include "base64.h"
+#include "ui.h"
 
 #define RESPONSE_BODY_SIZE 128
-#define BASE_URL "https://netease-cloud-music-api-theta-steel.vercel.app"
+char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char *qr_res = NULL;
 const char *fetch_err = NULL;
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
+    // fetch_err = response_body;
     char *s;
     if (qr_res == NULL){
         s = malloc(strlen(response_body) + 1);
@@ -25,7 +30,7 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         strcat(s, response_body);
     } 
     qr_res = s;
-    // free(s);
+    // // free(s);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
     struct json_object *data;
@@ -39,16 +44,22 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *result = NULL;
         result = replaceWord(str_qrimg, "data:image/png;base64,", "");
         printf("decode qrimg: %s\n", result);
+        // fetch_err = result;
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
-        size_t output_length;
-        unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
-        fwrite(png_data, 1, output_length, file);
-        fclose(file);
+        if(file != NULL) {
+            fetch_err = "Please scan qrcode..";
+            size_t output_length;
+            unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
+            fwrite(png_data, 1, output_length, file);
+            fclose(file);
+            show_login_qr();
+        }
+        
     }
-    free(parsed_json);
-    free(data);
-    free(qrimg);
+    // free(parsed_json);
+    // free(data);
+    // free(qrimg);
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
@@ -71,7 +82,6 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(data, "unikey", &key);
     const char *str_key = json_object_get_string(key);
     printf("key: %s\n", str_key);
-
     char *s1 = BASE_URL;
     char *s2 = "/login/qr/create?key=";
     const char *s3 = str_key;
@@ -81,11 +91,12 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     strcat(s, s2);
     strcat(s, s3);
     strcat(s, s4);
+    // fetch_err = s;
     request(s, create_qr);
-    free(parsed_json);
-    free(s);
-    free(data);
-    free(key);
+    // free(parsed_json);
+    // free(s);
+    // free(data);
+    // free(key);
 
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
@@ -126,7 +137,7 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     if (res != CURLE_OK) {
         const char *err = curl_easy_strerror(res);
         printf("curl_easy_perform() failed: %s\n", err);
-        fetch_err = err;
+        // fetch_err = err;
     }
         
     curl_easy_cleanup(curl);
@@ -181,14 +192,14 @@ void fetch_song(char *url)
 
 void login() {
     // get key
-    char *s1 = BASE_URL;
-    char *s2 = "/login/qr/key";
-    char *s = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
-    strcpy(s, s1);
-    strcat(s, s2);
+    // char *s1 = BASE_URL;
+    // char *s2 = "/login/qr/key";
+    // char *s = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    // strcpy(s, s1);
+    // strcat(s, s2);
 
-    request(s, get_key);
-    free(s);
+    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key);
+    // free(s);
     // create qr
     // get cookie, call check api
     // save cookie

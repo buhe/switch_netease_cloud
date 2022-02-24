@@ -88,15 +88,16 @@ int main(int argc, char *argv[])
     // // Deinitialize and clean up resources used by the console (important!)
     // consoleExit(NULL);
     // return 0;
-    romfsInit();
-    chdir("romfs:/");
     struct stat st = {0};
-
     if (stat("/song", &st) == -1)
     {
         mkdir("/song", 0700);
     }
-    // socketInitializeDefault();
+
+    socketInitializeDefault();
+    romfsInit();
+    // chdir("romfs:/");
+    
     int wait = 16;
     int exit_requested = 0;
 
@@ -122,13 +123,26 @@ int main(int argc, char *argv[])
     SDL_Texture *helloworld_tex = NULL;
 
     // load font from romfs
-    TTF_Font *font = TTF_OpenFont("data/LeroyLetteringLightBeta01.ttf", 36);
+    TTF_Font *font = TTF_OpenFont("romfs:/data/LeroyLetteringLightBeta01.ttf", 36);
 
     SDL_Window *window = SDL_CreateWindow("sdl2+mixer+image+ttf demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
     SDL_Surface *surface;
     SDL_Rect rect = {0, 200, 0, 0};
+    SDL_Texture *sdllogo_tex = NULL;
+    SDL_Rect sdl_pos = {0, 0, 0, 0};
+    // load logos from file
+    // SDL_Surface *sdllogo = IMG_Load("data/sdl.png");
+    // chdir("/");
+    // SDL_Surface *sdllogo = IMG_Load("/song/qr.png");
+    // if (sdllogo)
+    // {
+    //     sdl_pos.w = sdllogo->w;
+    //     sdl_pos.h = sdllogo->h;
+    //     sdllogo_tex = SDL_CreateTextureFromSurface(renderer, sdllogo);
+    //     SDL_FreeSurface(sdllogo);
+    // }
     // network_request();
     // fetch_songs_by_playlist("1");
     printf("curl init\n");
@@ -165,9 +179,6 @@ int main(int argc, char *argv[])
             SDL_RenderCopy(renderer, helloworld_tex, NULL, &rect);
         if (display_qr)
         {
-            SDL_Texture *sdllogo_tex = NULL;
-            SDL_Rect sdl_pos = {0, 0, 0, 0};
-            // load logos from file
             SDL_Surface *sdllogo = IMG_Load("/song/qr.png");
             if (sdllogo)
             {
@@ -193,5 +204,6 @@ int main(int argc, char *argv[])
     TTF_Quit();
     SDL_Quit();
     romfsExit();
+    socketExit();
     return 0;
 }
