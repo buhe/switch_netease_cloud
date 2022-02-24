@@ -14,7 +14,7 @@ sudo dkp-pacman -S switch-libjson-c
 1. open the hbmenu and press the Y button.
 2. ```make load```
 ### How to
-- [x] login in via scan qrcode.
+- [x] login via scan qrcode.
   - [x] fetch qr base64
   - [x] decode base64 and write to file
   - [x] render qrcode
