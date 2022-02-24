@@ -15,6 +15,11 @@ sudo dkp-pacman -S switch-libjson-c
 2. ```make load```
 ### How to
 - [x] login in via scan qrcode.
+  - [x] fetch qr base64
+  - [x] decode base64 and write to file
+  - [x] render qrcode
+  - [ ] call check and save cookie
+
 - [ ] fetch playlist via id.
 - [ ] if song file not download, download it.
 - [ ] play song via mpg123.
