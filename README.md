@@ -14,10 +14,10 @@ sudo dkp-pacman -S switch-libjson-c
 1. open the hbmenu and press the Y button.
 2. ```make load```
 ### How to
-1. login in via scan qrcode.
-2. fetch playlist via id.
-3. if song file not download, download it.
-4. play song via mpg123.
+- [x] login in via scan qrcode.
+- [ ] fetch playlist via id.
+- [ ] if song file not download, download it.
+- [ ] play song via mpg123.
 
 ### Features
 - play or pause.
