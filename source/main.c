@@ -32,6 +32,7 @@
 #define JOY_DOWN 15
 
 extern int display_qr;
+extern char *fetch_err;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -128,13 +129,6 @@ int main(int argc, char *argv[])
 
     SDL_Surface *surface;
     SDL_Rect rect = {0, 200, 0, 0};
-    surface = TTF_RenderText_Solid(font, "Login", colors[1]);
-    helloworld_tex = SDL_CreateTextureFromSurface(renderer, surface);
-    (&rect)->w = surface->w;
-    (&rect)->h = surface->h;
-
-    SDL_FreeSurface(surface);
-
     // network_request();
     // fetch_songs_by_playlist("1");
     printf("curl init\n");
@@ -159,7 +153,14 @@ int main(int argc, char *argv[])
                     display_qr = !display_qr;
             }
         }
+        if (fetch_err != NULL) { 
+            surface = TTF_RenderText_Solid(font, fetch_err, colors[3]);
+            helloworld_tex = SDL_CreateTextureFromSurface(renderer, surface);
+            (&rect)->w = surface->w;
+            (&rect)->h = surface->h;
 
+            SDL_FreeSurface(surface);
+        }
         if (helloworld_tex)
             SDL_RenderCopy(renderer, helloworld_tex, NULL, &rect);
         if (display_qr)

@@ -10,6 +10,7 @@
 #define RESPONSE_BODY_SIZE 128
 #define BASE_URL "https://netease-cloud-music-api-theta-steel.vercel.app"
 static char *qr_res = NULL;
+const char *fetch_err = NULL;
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
@@ -122,8 +123,12 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
     curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 120000L);
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
-        printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    if (res != CURLE_OK) {
+        const char *err = curl_easy_strerror(res);
+        printf("curl_easy_perform() failed: %s\n", err);
+        fetch_err = err;
+    }
+        
     curl_easy_cleanup(curl);
 }
 char *get_url(char *id)
