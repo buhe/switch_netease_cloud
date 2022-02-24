@@ -42,7 +42,7 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
-#ROMFS	:=	romfs
+ROMFS	:=	romfs
 
 APP_TITLE   := netease_cloud
 APP_AUTHOR  := buhe
