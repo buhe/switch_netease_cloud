@@ -26,11 +26,10 @@ sudo dkp-pacman -S switch-libjson-c
 
 ### Features
 - play or pause.
+- use cache when lose network
 
 ### UI
-- cli ?
 - pure sdl2
-- plutnium ?
 
 ### Debug
 
