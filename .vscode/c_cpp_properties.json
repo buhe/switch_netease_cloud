@@ -7,7 +7,6 @@
                 "${env:DEVKITPRO}/devkitA64/lib/gcc/aarch64-none-elf/10.1.0/include/**",
                 "${env:DEVKITPRO}/libnx/include/**",
                 "${env:DEVKITPRO}/portlibs/switch/include/**",
-                "Plutonium/include",
                 "include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/**"
             ],
