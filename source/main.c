@@ -34,6 +34,7 @@
 extern int display_qr;
 extern char *fetch_err;
 extern char *check_msg;
+int check_en = 1;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -154,8 +155,13 @@ int main(int argc, char *argv[])
                 if (event.jbutton.button == JOY_PLUS)
                     exit_requested = 1;
 
-                if (event.jbutton.button == JOY_Y)
-                    check();
+                if (event.jbutton.button == JOY_Y) {
+                    if (check_en) {
+                        // check_msg = "coo";
+                        check();
+                        check_en = 0;
+                    }
+                }
             }
         }
         if (check_msg != NULL) {

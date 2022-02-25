@@ -14,7 +14,7 @@
 #define STR_SIZE 10000
 #define RESPONSE_BODY_SIZE 128
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
-static char *qr_res = NULL;
+static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
 const char *fetch_err = NULL;
 const char *check_msg = NULL;
@@ -41,7 +41,7 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
     //     // free(response_body);
     // }
     // cookie_res = s;
-    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body);
+    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body); 
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
     if(parsed_json != NULL) {
@@ -81,17 +81,18 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
     // fetch_err = response_body;
-    char *s;
-    if (qr_res == NULL){
-        s = malloc(strlen(response_body) + 1);
-        strcpy(s, response_body);
-    } else {
-        s = malloc(strlen(qr_res) + strlen(response_body) + 1);
-        strcpy(s, qr_res);
-        strcat(s, response_body);
-    } 
-    qr_res = s;
+    // char *s;
+    // if (qr_res == NULL){
+    //     s = malloc(strlen(response_body) + 1);
+    //     strcpy(s, response_body);
+    // } else {
+    //     s = malloc(strlen(qr_res) + strlen(response_body) + 1);
+    //     strcpy(s, qr_res);
+    //     strcat(s, response_body);
+    // } 
+    // qr_res = s;
     // // free(s);
+    snprintf(qr_res, sizeof(qr_res), "%s%s", qr_res, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
     struct json_object *data;
@@ -144,15 +145,17 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     const char *str_key = json_object_get_string(key);
     printf("key: %s\n", str_key);
     g_key = str_key;
-    char *s1 = BASE_URL;
-    char *s2 = "/login/qr/create?key=";
-    const char *s3 = str_key;
-    char *s4 = "&qrimg=true";
-    char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + strlen(s4) + 1); // +1 for the null-terminator
-    strcpy(s, s1);
-    strcat(s, s2);
-    strcat(s, s3);
-    strcat(s, s4);
+    // char *s1 = BASE_URL;
+    // char *s2 = "/login/qr/create?key=";
+    // const char *s3 = str_key;
+    // char *s4 = "&qrimg=true";
+    // char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + strlen(s4) + 1); // +1 for the null-terminator
+    // strcpy(s, s1);
+    // strcat(s, s2);
+    // strcat(s, s3);
+    // strcat(s, s4);
+    char s[STR_SIZE] = {0};
+    snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
     request(s, create_qr);
     // free(parsed_json);
     // free(s);
@@ -256,13 +259,15 @@ void login() {
 }
 
 void check() {
-    char *s1 = BASE_URL;
-    char *s2 = "/login/qr/check?key=";
-    const char *s3 = g_key;
-    char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + 1); // +1 for the null-terminator
-    strcpy(s, s1);
-    strcat(s, s2);
-    strcat(s, s3);
+    // char *s1 = BASE_URL;
+    // char *s2 = "/login/qr/check?key=";
+    // const char *s3 = g_key;
+    // char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + 1); // +1 for the null-terminator
+    // strcpy(s, s1);
+    // strcat(s, s2);
+    // strcat(s, s3);
+    char s[STR_SIZE] = {0};
+    snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/login/qr/check?key=", g_key);
     request(s, save_cookie);
 }
 
