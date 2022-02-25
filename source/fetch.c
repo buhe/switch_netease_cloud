@@ -11,50 +11,62 @@
 #include "base64.h"
 #include "ui.h"
 
+#define STR_SIZE 10000
 #define RESPONSE_BODY_SIZE 128
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char *qr_res = NULL;
-static char *cookie_res = NULL;
+static char cookie_res[STR_SIZE] = {0};
 const char *fetch_err = NULL;
 const char *check_msg = NULL;
-const char *g_key = NULL;
+const char *g_key = "";
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
+    // check_msg = response_body;
 
-    char *s;
-    if (cookie_res == NULL)
-    {
-        s = malloc(strlen(response_body) + 1);
-        strcpy(s, response_body);
-    }
-    else
-    {
-        s = malloc(strlen(qr_res) + strlen(response_body) + 1);
-        strcpy(s, cookie_res);
-        strcat(s, response_body);
-    }
-    cookie_res = s;
-
+    // char *s;
+    // if (cookie_res == NULL)
+    // {
+    //     s = malloc(strlen(response_body) + 1);
+    //     strcpy(s, response_body);
+    //     // free(response_body);
+    // }
+    // else
+    // {
+    //     s = malloc(strlen(qr_res) + strlen(response_body) + 1);
+    //     strcpy(s, cookie_res);
+    //     strcat(s, response_body);
+    //     // free(cookie_res);
+    //     // free(response_body);
+    // }
+    // cookie_res = s;
+    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
-    struct json_object *code;
-    json_object_object_get_ex(parsed_json, "code", &code);
-    check_msg = "call check";
-    // int int_code = json_object_get_int(code);
-    // if (int_code != NaN) {
-        
-    //     if (int_code == 800)
-    //     {
-    //         check_msg = "qrcode not exist or timeout";
-    //     }
-    //     if (int_code == 803)
-    //     {
-    //         check_msg = "login sucessful";
-    //         // save cookie
-    //     }
-    // }
+    if(parsed_json != NULL) {
+        struct json_object *code;
+        json_object_object_get_ex(parsed_json, "code", &code);
+        // check_msg = response_body;
+        int int_code = json_object_get_int(code);
+        if (int_code != 0)
+        {
+
+            if (int_code == 800)
+            {
+                check_msg = "qrcode not exist or timeout";
+            }
+            if (int_code == 801)
+            {
+                check_msg = "wait scan..";
+            }
+            if (int_code == 803)
+            {
+                check_msg = "login sucessful";
+                // save cookie
+            }
+        }
+    }
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
