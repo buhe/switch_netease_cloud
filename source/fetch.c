@@ -14,7 +14,56 @@
 #define RESPONSE_BODY_SIZE 128
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char *qr_res = NULL;
+static char *cookie_res = NULL;
 const char *fetch_err = NULL;
+const char *check_msg = NULL;
+const char *g_key = NULL;
+size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    // printf(">>%s", ptr);
+    char *response_body = (char *)ptr;
+
+    char *s;
+    if (cookie_res == NULL)
+    {
+        s = malloc(strlen(response_body) + 1);
+        strcpy(s, response_body);
+    }
+    else
+    {
+        s = malloc(strlen(qr_res) + strlen(response_body) + 1);
+        strcpy(s, cookie_res);
+        strcat(s, response_body);
+    }
+    cookie_res = s;
+
+    struct json_object *parsed_json;
+    parsed_json = json_tokener_parse(cookie_res);
+    struct json_object *code;
+    json_object_object_get_ex(parsed_json, "code", &code);
+    check_msg = "call check";
+    // int int_code = json_object_get_int(code);
+    // if (int_code != NaN) {
+        
+    //     if (int_code == 800)
+    //     {
+    //         check_msg = "qrcode not exist or timeout";
+    //     }
+    //     if (int_code == 803)
+    //     {
+    //         check_msg = "login sucessful";
+    //         // save cookie
+    //     }
+    // }
+    uint32_t response_body_len = strlen(response_body);
+    uint32_t len = size * nmemb;
+    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    {
+        len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    }
+    memcpy(response_body + response_body_len, ptr, len);
+    return size * nmemb;
+}
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
@@ -48,7 +97,7 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
         if(file != NULL) {
-            fetch_err = "Please scan qrcode..";
+            fetch_err = "Please scan qrcode..continue enter Y check";
             size_t output_length;
             unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
             fwrite(png_data, 1, output_length, file);
@@ -82,6 +131,7 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(data, "unikey", &key);
     const char *str_key = json_object_get_string(key);
     printf("key: %s\n", str_key);
+    g_key = str_key;
     char *s1 = BASE_URL;
     char *s2 = "/login/qr/create?key=";
     const char *s3 = str_key;
@@ -91,7 +141,6 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     strcat(s, s2);
     strcat(s, s3);
     strcat(s, s4);
-    // fetch_err = s;
     request(s, create_qr);
     // free(parsed_json);
     // free(s);
@@ -191,18 +240,18 @@ void fetch_song(char *url)
 }
 
 void login() {
-    // get key
-    // char *s1 = BASE_URL;
-    // char *s2 = "/login/qr/key";
-    // char *s = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
-    // strcpy(s, s1);
-    // strcat(s, s2);
-
     request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key);
-    // free(s);
-    // create qr
-    // get cookie, call check api
-    // save cookie
+}
+
+void check() {
+    char *s1 = BASE_URL;
+    char *s2 = "/login/qr/check?key=";
+    const char *s3 = g_key;
+    char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + 1); // +1 for the null-terminator
+    strcpy(s, s1);
+    strcat(s, s2);
+    strcat(s, s3);
+    request(s, save_cookie);
 }
 
 void fetch_songs_by_playlist(const char *name)

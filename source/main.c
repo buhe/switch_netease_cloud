@@ -33,6 +33,7 @@
 
 extern int display_qr;
 extern char *fetch_err;
+extern char *check_msg;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -120,7 +121,7 @@ int main(int argc, char *argv[])
         {0, 255, 255, 0},   // cyan
         {255, 0, 255, 0},   // purple
     };
-    SDL_Texture *helloworld_tex = NULL;
+    
 
     // load font from romfs
     TTF_Font *font = TTF_OpenFont("romfs:/data/LeroyLetteringLightBeta01.ttf", 36);
@@ -128,23 +129,13 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("sdl2+mixer+image+ttf demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
-    SDL_Surface *surface;
-    SDL_Rect rect = {0, 200, 0, 0};
+    
+    
+    SDL_Texture *helloworld_tex = NULL;
+    SDL_Texture *check_tex = NULL;
     SDL_Texture *sdllogo_tex = NULL;
-    SDL_Rect sdl_pos = {0, 0, 0, 0};
-    // load logos from file
-    // SDL_Surface *sdllogo = IMG_Load("data/sdl.png");
-    // chdir("/");
-    // SDL_Surface *sdllogo = IMG_Load("/song/qr.png");
-    // if (sdllogo)
-    // {
-    //     sdl_pos.w = sdllogo->w;
-    //     sdl_pos.h = sdllogo->h;
-    //     sdllogo_tex = SDL_CreateTextureFromSurface(renderer, sdllogo);
-    //     SDL_FreeSurface(sdllogo);
-    // }
-    // network_request();
-    // fetch_songs_by_playlist("1");
+    
+ 
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
     login();
@@ -164,22 +155,40 @@ int main(int argc, char *argv[])
                     exit_requested = 1;
 
                 if (event.jbutton.button == JOY_Y)
-                    display_qr = !display_qr;
+                    check();
             }
         }
-        if (fetch_err != NULL) { 
+        if (check_msg != NULL) {
+            SDL_Surface *check_surface;
+            SDL_Rect check_rect = {0, 300, 0, 0};
+            check_surface = TTF_RenderText_Solid(font, check_msg, colors[3]);
+            check_tex = SDL_CreateTextureFromSurface(renderer, check_surface);
+            (&check_rect)->w = check_surface->w;
+            (&check_rect)->h = check_surface->h;
+
+            SDL_FreeSurface(check_surface);
+            if (check_tex)
+                SDL_RenderCopy(renderer, check_tex, NULL, &check_rect);
+        }
+
+        if (fetch_err != NULL)
+        {
+            SDL_Surface *surface;
+            SDL_Rect rect = {0, 200, 0, 0};
             surface = TTF_RenderText_Solid(font, fetch_err, colors[3]);
             helloworld_tex = SDL_CreateTextureFromSurface(renderer, surface);
             (&rect)->w = surface->w;
             (&rect)->h = surface->h;
 
             SDL_FreeSurface(surface);
+            if (helloworld_tex)
+                SDL_RenderCopy(renderer, helloworld_tex, NULL, &rect);
         }
-        if (helloworld_tex)
-            SDL_RenderCopy(renderer, helloworld_tex, NULL, &rect);
+
         if (display_qr)
         {
             SDL_Surface *sdllogo = IMG_Load("/song/qr.png");
+            SDL_Rect sdl_pos = {0, 0, 0, 0};
             if (sdllogo)
             {
                 sdl_pos.w = sdllogo->w;
