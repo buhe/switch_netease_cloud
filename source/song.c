@@ -12,6 +12,6 @@ void pause() {
 
 enum status {
     download,
-    play,
-    pause,
+    playing,
+    paused,
 } s;
