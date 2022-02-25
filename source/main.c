@@ -97,6 +97,9 @@ int main(int argc, char *argv[])
     }
 
     socketInitializeDefault();
+
+    printf("curl init\n");
+    curl_global_init(CURL_GLOBAL_DEFAULT);
     romfsInit();
     // chdir("romfs:/");
     
@@ -137,10 +140,8 @@ int main(int argc, char *argv[])
     SDL_Texture *sdllogo_tex = NULL;
     
  
-    printf("curl init\n");
-    curl_global_init(CURL_GLOBAL_DEFAULT);
     login();
-    curl_global_cleanup();
+    
     // Main loop
     while (!exit_requested && appletMainLoop())
     {
@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
 
                 if (event.jbutton.button == JOY_Y) {
                     if (check_en) {
-                        // check_msg = "coo";
+                        // check_msg = "coo3";
                         check();
                         check_en = 0;
                     }
@@ -219,6 +220,7 @@ int main(int argc, char *argv[])
     TTF_Quit();
     SDL_Quit();
     romfsExit();
+    curl_global_cleanup();
     socketExit();
     return 0;
 }

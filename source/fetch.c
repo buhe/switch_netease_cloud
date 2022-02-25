@@ -23,6 +23,7 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
+    
     // check_msg = response_body;
 
     // char *s;
@@ -41,13 +42,13 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
     //     // free(response_body);
     // }
     // cookie_res = s;
-    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body); 
+    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body);
+    // fetch_err = cookie_res;
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
     if(parsed_json != NULL) {
         struct json_object *code;
         json_object_object_get_ex(parsed_json, "code", &code);
-        // check_msg = response_body;
         int int_code = json_object_get_int(code);
         if (int_code != 0)
         {
@@ -63,6 +64,17 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             if (int_code == 803)
             {
                 check_msg = "login sucessful";
+                struct json_object *cookie;
+                json_object_object_get_ex(parsed_json, "cookie", &cookie);
+                char *str_cookie = json_object_get_string(cookie);
+                printf("cookie: %s\n", str_cookie);
+                char *name = "/song/cookie.txt";
+                FILE *file = fopen(name, "w");
+                if (file != NULL)
+                {
+                    fprintf(file, str_cookie);
+                    fclose(file);
+                }
                 // save cookie
             }
         }
@@ -106,11 +118,10 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *result = NULL;
         result = replaceWord(str_qrimg, "data:image/png;base64,", "");
         printf("decode qrimg: %s\n", result);
-        // fetch_err = result;
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
         if(file != NULL) {
-            fetch_err = "Please scan qrcode..continue enter Y check";
+            // fetch_err = "Please scan qrcode..continue enter Y check";
             size_t output_length;
             unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
             fwrite(png_data, 1, output_length, file);
@@ -201,7 +212,6 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     if (res != CURLE_OK) {
         const char *err = curl_easy_strerror(res);
         printf("curl_easy_perform() failed: %s\n", err);
-        // fetch_err = err;
     }
         
     curl_easy_cleanup(curl);
@@ -259,13 +269,6 @@ void login() {
 }
 
 void check() {
-    // char *s1 = BASE_URL;
-    // char *s2 = "/login/qr/check?key=";
-    // const char *s3 = g_key;
-    // char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + 1); // +1 for the null-terminator
-    // strcpy(s, s1);
-    // strcat(s, s2);
-    // strcat(s, s3);
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/login/qr/check?key=", g_key);
     request(s, save_cookie);
