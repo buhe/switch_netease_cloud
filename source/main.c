@@ -35,6 +35,7 @@
 extern int display_qr;
 extern char *qr_msg;
 extern char *check_msg;
+extern char *g_cookie;
 int check_en = 1;
 
 // Main program entrypoint
@@ -119,6 +120,13 @@ int main(int argc, char *argv[])
             SDL_RenderCopy(renderer, t1, NULL, &t1_pos);
             SDL_DestroyTexture(t1);
         }
+        if (g_cookie)
+        {
+            SDL_Rect t3_pos = {0, 88, 0, 0};
+            SDL_Texture *t3 = render_text(renderer, g_cookie, font, colors[1], &t3_pos);
+            SDL_RenderCopy(renderer, t3, NULL, &t3_pos);
+            SDL_DestroyTexture(t3);
+        }
         if (display_qr)
         {
             SDL_Rect qr_pos = {0, 256, 0, 0};
@@ -130,7 +138,7 @@ int main(int argc, char *argv[])
 
         SDL_Delay(wait);
     }
-    
+
     TTF_CloseFont(font);
 
     SDL_DestroyWindow(window);

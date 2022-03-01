@@ -16,7 +16,8 @@ static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
-const char *g_key = "";
+const char *g_key = NULL;
+const char *g_cookie = NULL;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
@@ -64,7 +65,7 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
                 struct json_object *cookie;
                 json_object_object_get_ex(parsed_json, "cookie", &cookie);
                 char *str_cookie = json_object_get_string(cookie);
-                printf("cookie: %s\n", str_cookie);
+                g_cookie = str_cookie;
                 char *name = "/song/cookie.txt";
                 FILE *file = fopen(name, "w");
                 if (file != NULL)
