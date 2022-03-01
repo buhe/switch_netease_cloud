@@ -18,7 +18,7 @@ sudo dkp-pacman -S switch-libjson-c
   - [x] fetch qr base64
   - [x] decode base64 and write to file
   - [x] render qrcode
-  - [ ] call check and save cookie
+  - [x] call check and save cookie
 
 - [ ] fetch playlist via id.
 - [ ] if song file not download, download it.
