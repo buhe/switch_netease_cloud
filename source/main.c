@@ -36,6 +36,7 @@ extern int display_qr;
 extern char *qr_msg;
 extern char *check_msg;
 int check_en = 1;
+int fetch_songs_en = 1;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -102,6 +103,15 @@ int main(int argc, char *argv[])
                     if (check_en) {
                         check();
                         check_en = 0;
+                    }
+                }
+
+                if (event.jbutton.button == JOY_X)
+                {
+                    if (fetch_songs_en)
+                    {
+                        fetch_songs_by_playlist("72614739");
+                        fetch_songs_en = 0;
                     }
                 }
             }

@@ -11,12 +11,14 @@
 
 #define STR_SIZE 10000
 #define RESPONSE_BODY_SIZE 128
+#define COOKIE "/song/auto_cookies.txt"
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
+static char songs_res[STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
-const char *g_key = "";
+const char *g_key = NULL;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
@@ -64,14 +66,14 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
                 struct json_object *cookie;
                 json_object_object_get_ex(parsed_json, "cookie", &cookie);
                 char *str_cookie = json_object_get_string(cookie);
-                printf("cookie: %s\n", str_cookie);
-                char *name = "/song/cookie.txt";
-                FILE *file = fopen(name, "w");
-                if (file != NULL)
-                {
-                    fprintf(file, str_cookie);
-                    fclose(file);
-                }
+                // printf("cookie: %s\n", str_cookie);
+                // char *name = "/song/cookie.txt";
+                // FILE *file = fopen(name, "w");
+                // if (file != NULL)
+                // {
+                //     fprintf(file, str_cookie);
+                //     fclose(file);
+                // }
                 // save cookie
             }
         }
@@ -175,6 +177,8 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
     curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 120000L);
+    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, COOKIE);
+    // curl_easy_setopt(curl, CURLOPT_COOKIEJAR, COOKIE);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         const char *err = curl_easy_strerror(res);
@@ -241,6 +245,31 @@ void check() {
     request(s, save_cookie);
 }
 
-void fetch_songs_by_playlist(const char *name)
+size_t get_songs(void *ptr, size_t size, size_t nmemb, void *stream)
 {
+    char *response_body = (char *)ptr;
+    snprintf(songs_res, sizeof(songs_res), "%s%s", songs_res, response_body);
+    struct json_object *parsed_json;
+    parsed_json = json_tokener_parse(songs_res);
+    if (parsed_json)
+    {
+        // g_songs = songs_res;
+    }
+
+    uint32_t response_body_len = strlen(response_body);
+    uint32_t len = size * nmemb;
+    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    {
+        len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    }
+    memcpy(response_body + response_body_len, ptr, len);
+    return size * nmemb;
+}
+
+void fetch_songs_by_playlist(const char *id)
+{
+    // https://netease-cloud-music-api-theta-steel.vercel.app/playlist/detail?id=72614739
+    char s[STR_SIZE] = {0};
+    snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/playlist/detail?id=", id);
+    request(s, get_songs);
 }
