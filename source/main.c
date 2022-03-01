@@ -15,6 +15,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "fetch.h"
+#include "ui.h"
 
 #define SCREEN_W 1280
 #define SCREEN_H 720
@@ -32,64 +33,13 @@
 #define JOY_DOWN 15
 
 extern int display_qr;
-extern char *fetch_err;
+extern char *qr_msg;
 extern char *check_msg;
 int check_en = 1;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
 {
-    // This example uses a text console, as a simple way to output text to the screen.
-    // If you want to write a software-rendered graphics application,
-    //   take a look at the graphics/simplegfx example, which uses the libnx Framebuffer API instead.
-    // If on the other hand you want to write an OpenGL based application,
-    //   take a look at the graphics/opengl set of examples, which uses EGL instead.
-    // consoleInit(NULL);
-
-    // // Configure our supported input layout: a single player with standard controller styles
-    // padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-
-    // // Initialize the default gamepad (which reads handheld mode inputs as well as the first connected controller)
-    // PadState pad;
-    // padInitializeDefault(&pad);
-
-    // socketInitializeDefault();
-    // struct stat st = {0};
-
-    // if (stat("/song", &st) == -1)
-    // {
-    //     mkdir("/song", 0700);
-    // }
-
-    // // network_request();
-    // // fetch_songs_by_playlist("1");
-    // printf("curl init\n");
-    // curl_global_init(CURL_GLOBAL_DEFAULT);
-    // login();
-    // curl_global_cleanup();
-    // // Main loop
-    // while (appletMainLoop())
-    // {
-    //     // Scan the gamepad. This should be done once for each frame
-    //     padUpdate(&pad);
-
-    //     // padGetButtonsDown returns the set of buttons that have been
-    //     // newly pressed in this frame compared to the previous one
-    //     u64 kDown = padGetButtonsDown(&pad);
-
-    //     if (kDown & HidNpadButton_Plus)
-    //         break; // break in order to return to hbmenu
-
-    //     // Your code goes here
-
-    //     // Update the console, sending a new frame to the display
-    //     consoleUpdate(NULL);
-    // }
-
-    // socketExit();
-    // // Deinitialize and clean up resources used by the console (important!)
-    // consoleExit(NULL);
-    // return 0;
     struct stat st = {0};
     if (stat("/song", &st) == -1)
     {
@@ -101,9 +51,8 @@ int main(int argc, char *argv[])
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
     romfsInit();
-    // chdir("romfs:/");
     
-    int wait = 16;
+    int wait = 25;
     int exit_requested = 0;
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
@@ -128,18 +77,11 @@ int main(int argc, char *argv[])
     
 
     // load font from romfs
-    TTF_Font *font = TTF_OpenFont("romfs:/data/LeroyLetteringLightBeta01.ttf", 36);
+    TTF_Font *font = TTF_OpenFont("romfs:/data/simhei.ttf", 36);
 
-    SDL_Window *window = SDL_CreateWindow("sdl2+mixer+image+ttf demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("music", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-
     
-    
-    SDL_Texture *helloworld_tex = NULL;
-    SDL_Texture *check_tex = NULL;
-    SDL_Texture *sdllogo_tex = NULL;
-    
- 
     login();
     
     // Main loop
@@ -158,63 +100,41 @@ int main(int argc, char *argv[])
 
                 if (event.jbutton.button == JOY_Y) {
                     if (check_en) {
-                        // check_msg = "coo3";
                         check();
                         check_en = 0;
                     }
                 }
             }
         }
-        if (check_msg != NULL) {
-            SDL_Surface *check_surface;
-            SDL_Rect check_rect = {0, 300, 0, 0};
-            check_surface = TTF_RenderText_Solid(font, check_msg, colors[3]);
-            check_tex = SDL_CreateTextureFromSurface(renderer, check_surface);
-            (&check_rect)->w = check_surface->w;
-            (&check_rect)->h = check_surface->h;
-
-            SDL_FreeSurface(check_surface);
-            if (check_tex)
-                SDL_RenderCopy(renderer, check_tex, NULL, &check_rect);
+        SDL_RenderClear(renderer);
+        if (check_msg) {
+            SDL_Rect t2_pos = {0, 44, 0, 0};
+            SDL_Texture *t2 = render_text(renderer, check_msg, font, colors[1], &t2_pos);
+            SDL_RenderCopy(renderer, t2, NULL, &t2_pos);
+            SDL_DestroyTexture(t2);
         }
-
-        if (fetch_err != NULL)
-        {
-            SDL_Surface *surface;
-            SDL_Rect rect = {0, 200, 0, 0};
-            surface = TTF_RenderText_Solid(font, fetch_err, colors[3]);
-            helloworld_tex = SDL_CreateTextureFromSurface(renderer, surface);
-            (&rect)->w = surface->w;
-            (&rect)->h = surface->h;
-
-            SDL_FreeSurface(surface);
-            if (helloworld_tex)
-                SDL_RenderCopy(renderer, helloworld_tex, NULL, &rect);
+        if (qr_msg) {
+            SDL_Rect t1_pos = {0, 0, 0, 0};
+            SDL_Texture *t1 = render_text(renderer, qr_msg, font, colors[1], &t1_pos);
+            SDL_RenderCopy(renderer, t1, NULL, &t1_pos);
+            SDL_DestroyTexture(t1);
         }
-
         if (display_qr)
         {
-            SDL_Surface *sdllogo = IMG_Load("/song/qr.png");
-            SDL_Rect sdl_pos = {0, 0, 0, 0};
-            if (sdllogo)
-            {
-                sdl_pos.w = sdllogo->w;
-                sdl_pos.h = sdllogo->h;
-                sdllogo_tex = SDL_CreateTextureFromSurface(renderer, sdllogo);
-                SDL_FreeSurface(sdllogo);
-            }
-            // put logos on screen
-            if (sdllogo_tex)
-                SDL_RenderCopy(renderer, sdllogo_tex, NULL, &sdl_pos);
+            SDL_Rect qr_pos = {0, 256, 0, 0};
+            SDL_Texture *qr = render_image(renderer, "/song/qr.png", &qr_pos);
+            SDL_RenderCopy(renderer, qr, NULL, &qr_pos);
+            SDL_DestroyTexture(qr);
         }
         SDL_RenderPresent(renderer);
 
         SDL_Delay(wait);
     }
+    
+    TTF_CloseFont(font);
 
-    // clean up your textures when you are done with them
-    if (helloworld_tex)
-        SDL_DestroyTexture(helloworld_tex);
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
 
     IMG_Quit();
     TTF_Quit();

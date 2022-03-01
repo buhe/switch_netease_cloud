@@ -4,8 +4,6 @@
 #include <string.h>
 #include <errno.h>
 #include <json-c/json.h>
-#define _OPEN_SYS_ITOA_EXT
-
 
 #include "fetch.h"
 #include "base64.h"
@@ -16,12 +14,11 @@
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
-const char *fetch_err = NULL;
+const char *qr_msg = NULL;
 const char *check_msg = NULL;
 const char *g_key = "";
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-    // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
     
     // check_msg = response_body;
@@ -90,20 +87,9 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 }
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-    // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
-    // fetch_err = response_body;
-    // char *s;
-    // if (qr_res == NULL){
-    //     s = malloc(strlen(response_body) + 1);
-    //     strcpy(s, response_body);
-    // } else {
-    //     s = malloc(strlen(qr_res) + strlen(response_body) + 1);
-    //     strcpy(s, qr_res);
-    //     strcat(s, response_body);
-    // } 
-    // qr_res = s;
-    // // free(s);
+    // char *tmp = malloc(strlen(qr_res)); 
+    // strcpy(qr_res);
     snprintf(qr_res, sizeof(qr_res), "%s%s", qr_res, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
@@ -112,7 +98,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     struct json_object *qrimg;
     json_object_object_get_ex(data, "qrimg", &qrimg);
     const char *str_qrimg = json_object_get_string(qrimg);
-    // printf("qrimg: %s\n", str_qrimg);
     
     if (str_qrimg != NULL) {
         char *result = NULL;
@@ -121,18 +106,15 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
         if(file != NULL) {
-            // fetch_err = "Please scan qrcode..continue enter Y check";
             size_t output_length;
             unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
             fwrite(png_data, 1, output_length, file);
             fclose(file);
             show_login_qr();
+            qr_msg = "Please scan qrcode..continue enter Y check";
         }
         
     }
-    // free(parsed_json);
-    // free(data);
-    // free(qrimg);
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
     if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
@@ -145,7 +127,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 
 size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-    // printf(">>%s", ptr);
     char *response_body = (char *)ptr;
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(response_body);
@@ -154,24 +135,12 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     struct json_object *key;
     json_object_object_get_ex(data, "unikey", &key);
     const char *str_key = json_object_get_string(key);
-    printf("key: %s\n", str_key);
+
     g_key = str_key;
-    // char *s1 = BASE_URL;
-    // char *s2 = "/login/qr/create?key=";
-    // const char *s3 = str_key;
-    // char *s4 = "&qrimg=true";
-    // char *s = malloc(strlen(s1) + strlen(s2) + strlen(s3) + strlen(s4) + 1); // +1 for the null-terminator
-    // strcpy(s, s1);
-    // strcat(s, s2);
-    // strcat(s, s3);
-    // strcat(s, s4);
+
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
     request(s, create_qr);
-    // free(parsed_json);
-    // free(s);
-    // free(data);
-    // free(key);
 
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;
@@ -192,8 +161,6 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     {
         return ;
     }
-
-    // char *jsonObj = "{ \"name\" : \"Pedro\" , \"age\" : \"22\" }";
 
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "Accept: application/json");
