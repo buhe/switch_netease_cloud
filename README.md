@@ -31,6 +31,9 @@ sudo dkp-pacman -S switch-libjson-c
 ### UI
 - pure sdl2
 
+### Design
+https://www.figma.com/file/BMqb2WCmluOGYmek0blxfn/ns
+
 ### Debug
 
 ```bash
