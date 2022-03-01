@@ -36,7 +36,9 @@ extern int display_qr;
 extern char *qr_msg;
 extern char *check_msg;
 extern char *g_cookie;
+extern char *g_songs;
 int check_en = 1;
+int fetch_songs_en = 1;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -105,6 +107,17 @@ int main(int argc, char *argv[])
                         check_en = 0;
                     }
                 }
+
+                if (event.jbutton.button == JOY_X)
+                {
+                    if (fetch_songs_en)
+                    {
+                        fetch_songs_by_playlist("72614739");
+                        fetch_songs_en = 0;
+                    }
+                }
+
+                
             }
         }
         SDL_RenderClear(renderer);
@@ -126,6 +139,13 @@ int main(int argc, char *argv[])
             SDL_Texture *t3 = render_text(renderer, g_cookie, font, colors[1], &t3_pos);
             SDL_RenderCopy(renderer, t3, NULL, &t3_pos);
             SDL_DestroyTexture(t3);
+        }
+        if (g_songs)
+        {
+            SDL_Rect t4_pos = {0, 132, 0, 0};
+            SDL_Texture *t4 = render_text(renderer, g_songs, font, colors[1], &t4_pos);
+            SDL_RenderCopy(renderer, t4, NULL, &t4_pos);
+            SDL_DestroyTexture(t4);
         }
         if (display_qr)
         {

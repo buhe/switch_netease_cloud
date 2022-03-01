@@ -1,7 +1,10 @@
-struct song
+typedef struct
 {
+    int id;
+    char name[100];
+    char url[100];
     /* data */
-};
+} Song;
 void play() {
 
 }
