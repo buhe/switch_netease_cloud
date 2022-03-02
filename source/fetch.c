@@ -10,7 +10,7 @@
 #include "ui.h"
 
 #define STR_SIZE 100000
-#define RESPONSE_BODY_SIZE 128
+// #define RESPONSE_BODY_SIZE 128
 #define COOKIE "/song/auto_cookies.txt"
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
@@ -43,7 +43,9 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
     //     // free(response_body);
     // }
     // cookie_res = s;
-    snprintf(cookie_res, sizeof(cookie_res), "%s%s", cookie_res, response_body);
+    char tmp[STR_SIZE] = {0};
+    strcpy(tmp, cookie_res);
+    snprintf(cookie_res, sizeof(cookie_res), "%s%s", tmp, response_body);
     // fetch_err = cookie_res;
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
@@ -65,9 +67,9 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             if (int_code == 803)
             {
                 check_msg = "login sucessful";
-                struct json_object *cookie;
-                json_object_object_get_ex(parsed_json, "cookie", &cookie);
-                char *str_cookie = json_object_get_string(cookie);
+                // struct json_object *cookie;
+                // json_object_object_get_ex(parsed_json, "cookie", &cookie);
+                // char *str_cookie = json_object_get_string(cookie);
                 // printf("cookie: %s\n", str_cookie);
                 // char *name = "/song/cookie.txt";
                 // FILE *file = fopen(name, "w");
@@ -80,13 +82,13 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             }
         }
     }
-    uint32_t response_body_len = strlen(response_body);
-    uint32_t len = size * nmemb;
-    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    {
-        len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    }
-    memcpy(response_body + response_body_len, ptr, len);
+    // uint32_t response_body_len = strlen(response_body);
+    // uint32_t len = size * nmemb;
+    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    // {
+    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    // }
+    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -94,7 +96,9 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     char *response_body = (char *)ptr;
     // char *tmp = malloc(strlen(qr_res)); 
     // strcpy(qr_res);
-    snprintf(qr_res, sizeof(qr_res), "%s%s", qr_res, response_body);
+    char tmp[STR_SIZE] = {0};
+    strcpy(tmp, qr_res);
+    snprintf(qr_res, sizeof(qr_res), "%s%s", tmp, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
     struct json_object *data;
@@ -110,6 +114,7 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *name = "/song/qr.png";
         FILE *file = fopen(name, "wb");
         if(file != NULL) {
+            printf("create qr file\n");
             size_t output_length;
             unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
             fwrite(png_data, 1, output_length, file);
@@ -119,13 +124,13 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         }
         
     }
-    uint32_t response_body_len = strlen(response_body);
-    uint32_t len = size * nmemb;
-    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    {
-        len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    }
-    memcpy(response_body + response_body_len, ptr, len);
+    // uint32_t response_body_len = strlen(response_body);
+    // uint32_t len = size * nmemb;
+    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    // {
+    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    // }
+    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 
@@ -146,13 +151,13 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
     request(s, create_qr);
 
-    uint32_t response_body_len = strlen(response_body);
-    uint32_t len = size * nmemb;
-    if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    {
-        len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    }
-    memcpy(response_body + response_body_len, ptr, len);
+    // uint32_t response_body_len = strlen(response_body);
+    // uint32_t len = size * nmemb;
+    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
+    // {
+    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
+    // }
+    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
@@ -256,7 +261,9 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     char *response_body = (char *)contents;
-    snprintf(songs_res, sizeof(songs_res), "%s%s", songs_res, response_body);
+    char tmp[STR_SIZE] = {0};
+    strcpy(tmp, songs_res);
+    snprintf(songs_res, sizeof(songs_res), "%s%s", tmp, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(songs_res);
     if (parsed_json)
