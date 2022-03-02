@@ -218,4 +218,4 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 endif
 #---------------------------------------------------------------------------------------
 load: all
-	nxlink -a 192.168.31.64 ./hello_switch.nro
+	nxlink -s -a 192.168.31.64 ./hello_switch.nro

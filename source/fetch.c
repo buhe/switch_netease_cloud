@@ -15,10 +15,11 @@
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
-static char songs_res[STR_SIZE] = {0};
+static char *songs_res = NULL;
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
 const char *g_key = NULL;
+const char *g_songs = NULL;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
@@ -176,8 +177,8 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(payload));
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
-    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 120000L);
-    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, COOKIE);
+    // curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 120000L);
+    // curl_easy_setopt(curl, CURLOPT_COOKIEFILE, COOKIE);
     // curl_easy_setopt(curl, CURLOPT_COOKIEJAR, COOKIE);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
@@ -248,13 +249,14 @@ void check() {
 size_t get_songs(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    snprintf(songs_res, sizeof(songs_res), "%s%s", songs_res, response_body);
-    struct json_object *parsed_json;
-    parsed_json = json_tokener_parse(songs_res);
-    if (parsed_json)
-    {
-        // g_songs = songs_res;
-    }
+    // snprintf(songs_res, sizeof(songs_res), "%s%s", songs_res, response_body);
+    printf("songs res:%s", response_body);
+    // struct json_object *parsed_json;
+    // parsed_json = json_tokener_parse(songs_res);
+    // if (parsed_json)
+    // {
+    //     g_songs = songs_res;
+    // }
 
     uint32_t response_body_len = strlen(response_body);
     uint32_t len = size * nmemb;

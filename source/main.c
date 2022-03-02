@@ -35,6 +35,8 @@
 extern int display_qr;
 extern char *qr_msg;
 extern char *check_msg;
+extern char *g_songs;
+
 int check_en = 1;
 int fetch_songs_en = 1;
 
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
     }
 
     socketInitializeDefault();
+    nxlinkStdio();
 
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -83,8 +86,8 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("music", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     
-    login();
-    
+    // login();
+    fetch_songs_by_playlist("72614739");
     // Main loop
     while (!exit_requested && appletMainLoop())
     {
@@ -128,6 +131,13 @@ int main(int argc, char *argv[])
             SDL_Texture *t1 = render_text(renderer, qr_msg, font, colors[1], &t1_pos);
             SDL_RenderCopy(renderer, t1, NULL, &t1_pos);
             SDL_DestroyTexture(t1);
+        }
+        if (g_songs)
+        {
+            SDL_Rect t4_pos = {0, 132, 0, 0};
+            SDL_Texture *t4 = render_text(renderer, g_songs, font, colors[1], &t4_pos);
+            SDL_RenderCopy(renderer, t4, NULL, &t4_pos);
+            SDL_DestroyTexture(t4);
         }
         if (display_qr)
         {
