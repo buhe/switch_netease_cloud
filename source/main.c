@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("music", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     
-    // login();
-    fetch_songs_by_playlist("72614739");
+    login();
+    // fetch_songs_by_playlist("72614739");
     // Main loop
     while (!exit_requested && appletMainLoop())
     {
