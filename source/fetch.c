@@ -7,8 +7,7 @@
 
 #include "fetch.h"
 #include "base64.h"
-#include "ui.h" 
-#include "song.h" 
+#include "ui.h"  
 #include "account.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
@@ -151,10 +150,7 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
         printf("rename file not successful,cause:%d\n", errno);
     }
 }
-char *get_url(char *id)
-{
-    return id;
-}
+
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -245,8 +241,13 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
             s.id = int_id;
             strcpy(s.name, str_name);
             songs[i] = s;
+            // reset songs res
+            // strcpy(songs_res, "");
+     
+            request_song(songs[i].id, songs[i]);
             printf("id: %d\n", songs[i].id);
             printf("name: %s\n", songs[i].name);
+            printf("url: %s\n", songs[i].url);
         }
         song_len = arraylen;
         g_songs = songs;
@@ -260,4 +261,62 @@ void fetch_songs_by_playlist(const char *id)
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/playlist/detail?id=", id);
     request(s, get_songs);
+}
+static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    char *response_body = (char *)contents;
+    // char tmp[STR_SIZE] = {0};
+    // strcpy(tmp, songs_res);
+    // snprintf(songs_res, sizeof(songs_res), "%s%s", tmp, response_body);
+    struct json_object *parsed_json;
+    parsed_json = json_tokener_parse(response_body);
+    if (parsed_json)
+    {
+        // printf("%s", songs_res);
+        struct json_object *data;
+        json_object_object_get_ex(parsed_json, "data", &data);
+        struct json_object *url;
+        json_object_object_get_ex(data, "url", &url);
+
+        Song *song = (Song *)userp;
+        strcpy(song->url, json_object_get_string(url));
+    }
+    return realsize;
+}
+
+void request_song(int id, Song song) {
+    char url[STR_SIZE] = {0};
+    snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", id);
+    printf("url: %s\n", url);
+    CURL *curl;
+    CURLcode res;
+    curl = curl_easy_init();
+    if (curl == NULL)
+    {
+        return;
+    }
+
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Accept: application/json");
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "charset: utf-8");
+
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_url);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&song);
+
+    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, R_COOKIE);
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+    {
+        const char *err = curl_easy_strerror(res);
+        printf("curl_easy_perform() failed: %s\n", err);
+    }
 }

@@ -4,6 +4,8 @@
 #define W_COOKIE "song/w_cookies.txt"
 #define R_COOKIE "song/r_cookies.txt"
 
+#include "song.h"
+
 void fetch_songs_by_playlist(const char *name);
 
 void login();
@@ -17,3 +19,5 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream);
 size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream);
 
 void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream));
+
+void request_song(int id, Song song);
