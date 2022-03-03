@@ -49,13 +49,6 @@ int main(int argc, char *argv[])
     socketInitializeDefault();
     nxlinkStdio();
 
-    // struct stat st = {0};
-    // if (stat(APP_DIR, &st) == -1)
-    // {
-    //     printf("init dir");
-    //     mkdir(APP_DIR, 0700);
-    // }
-
     curl_global_init(CURL_GLOBAL_DEFAULT);
     romfsInit();
     
@@ -99,8 +92,6 @@ int main(int argc, char *argv[])
         printf("try login\n");
         login();
     }
-
-    // fetch_songs_by_playlist("72614739");
     // Main loop
     while (!exit_requested && appletMainLoop())
     {
