@@ -23,7 +23,7 @@ sudo dkp-pacman -S switch-libjson-c
   - [ ] logout
 
 - [ ] fetch playlist via id.
-  - [x] api
+  - [x] with cookie
   - [ ] song entry
   - [ ] use cache when network lose
 - [ ] if song file not download, download it.
