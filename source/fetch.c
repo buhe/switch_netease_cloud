@@ -9,9 +9,6 @@
 #include "base64.h"
 #include "ui.h"
 
-#define STR_SIZE 100000
-// #define RESPONSE_BODY_SIZE 128
-#define COOKIE "/song/auto_cookies.txt"
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
@@ -82,8 +79,8 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *result = NULL;
         result = replaceWord(str_qrimg, "data:image/png;base64,", "");
         printf("decode qrimg: %s\n", result);
-        char *name = "/song/qr.png";
-        FILE *file = fopen(name, "wb");
+        // char *name = "song/qr.png";
+        FILE *file = fopen(QR, "wb");
         if(file != NULL) {
             printf("create qr file\n");
             size_t output_length;
@@ -139,13 +136,14 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(payload));
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
-    // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
 
     // curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
     // curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 120000L);
-    // curl_easy_setopt(curl, CURLOPT_COOKIEFILE, COOKIE);
-    // curl_easy_setopt(curl, CURLOPT_COOKIEJAR, COOKIE);
+    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, R_COOKIE);
+    curl_easy_setopt(curl, CURLOPT_COOKIEJAR, W_COOKIE);
+
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         const char *err = curl_easy_strerror(res);
@@ -153,6 +151,11 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     }
         
     curl_easy_cleanup(curl);
+    remove(R_COOKIE);
+    if (rename(W_COOKIE, R_COOKIE) != 0)
+    {
+        printf("rename file not successful,cause:%d\n", errno);
+    }
 }
 char *get_url(char *id)
 {

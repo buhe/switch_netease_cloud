@@ -17,6 +17,7 @@
 #include "fetch.h"
 #include "ui.h"
 #include "base64.h"
+#include "main.h"
 
 #define SCREEN_W 1280
 #define SCREEN_H 720
@@ -44,14 +45,34 @@ int fetch_songs_en = 1;
 // Main program entrypoint
 int main(int argc, char *argv[])
 {
-    struct stat st = {0};
-    if (stat("/song", &st) == -1)
-    {
-        mkdir("/song", 0700);
-    }
-
     socketInitializeDefault();
     nxlinkStdio();
+
+    // DIR *dir;
+    // struct dirent *ent;
+
+    
+    // dir = opendir("");
+    // if (dir == NULL)
+    // {
+    //     printf("Failed to open dir.\n");
+    // }
+
+    // printf("Dir-listing for '':\n");
+    // while ((ent = readdir(dir)))
+    // {
+    //     printf("d_name: %s\n", ent->d_name);
+    // }
+    // closedir(dir);
+    // printf("Done.\n");
+
+    struct stat st = {0};
+    if (stat(APP_DIR, &st) == -1)
+    {
+        mkdir(APP_DIR, 0700);
+    }
+
+    
 
     printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -143,7 +164,7 @@ int main(int argc, char *argv[])
         if (display_qr)
         {
             SDL_Rect qr_pos = {0, 256, 0, 0};
-            SDL_Texture *qr = render_image(renderer, "/song/qr.png", &qr_pos);
+            SDL_Texture *qr = render_image(renderer, QR, &qr_pos);
             SDL_RenderCopy(renderer, qr, NULL, &qr_pos);
             SDL_DestroyTexture(qr);
         }

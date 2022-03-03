@@ -1,3 +1,9 @@
+#define STR_SIZE 200000
+
+#define QR "song/qrcode.png"
+#define W_COOKIE "song/w_cookies.txt"
+#define R_COOKIE "song/r_cookies.txt"
+
 void fetch_songs_by_playlist(const char *name);
 
 void login();
