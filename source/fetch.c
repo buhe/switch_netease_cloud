@@ -7,7 +7,8 @@
 
 #include "fetch.h"
 #include "base64.h"
-#include "ui.h"
+#include "ui.h" 
+#include "song.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
@@ -16,7 +17,9 @@ static char songs_res[STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
 const char *g_key = NULL;
-const char *g_songs = NULL;
+// const char *g_songs = NULL;
+int song_len;
+Song *g_songs;
 
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -44,18 +47,7 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             if (int_code == 803)
             {
                 check_msg = "login sucessful";
-                // struct json_object *cookie;
-                // json_object_object_get_ex(parsed_json, "cookie", &cookie);
-                // char *str_cookie = json_object_get_string(cookie);
-                // printf("cookie: %s\n", str_cookie);
-                // char *name = "/song/cookie.txt";
-                // FILE *file = fopen(name, "w");
-                // if (file != NULL)
-                // {
-                //     fprintf(file, str_cookie);
-                //     fclose(file);
-                // }
-                // save cookie
+                fetch_songs_by_playlist("72614739");
             }
         }
     }
@@ -226,7 +218,35 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
     parsed_json = json_tokener_parse(songs_res);
     if (parsed_json)
     {
-        printf("%s\n", songs_res);
+        // printf("%s", songs_res);
+        int arraylen, i;
+        struct json_object *playlist;
+        json_object_object_get_ex(parsed_json, "playlist", &playlist);
+        struct json_object *tracks;
+        json_object_object_get_ex(playlist, "tracks", &tracks);
+        struct json_object *song;
+        struct json_object *id;
+        struct json_object *name;
+        arraylen = json_object_array_length(tracks);
+        Song songs[arraylen];
+        printf("songs len:%d\n", arraylen);
+        for (i = 0; i < arraylen; i++)
+        {
+            song = json_object_array_get_idx(tracks, i);
+            Song s = {0};
+            json_object_object_get_ex(song, "name", &name);
+            const char *str_name = json_object_get_string(name);
+
+            json_object_object_get_ex(song, "id", &id);
+            const int int_id = json_object_get_int(id);
+
+            s.id = int_id;
+            strcpy(s.name, str_name);
+            songs[i] = s;
+            printf("id: %d\n", songs[i].id);
+        }
+        song_len = arraylen;
+        g_songs = songs;
     }
     return realsize;
 }
