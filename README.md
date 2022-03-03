@@ -18,7 +18,7 @@ sudo dkp-pacman -S switch-libjson-c
   - [x] fetch qr base64
   - [x] decode base64 and write to file
   - [x] render qrcode
-  - [ ] call check and save cookie
+  - [x] call check and save cookie
 
 - [ ] fetch playlist via id.
 - [ ] if song file not download, download it.
@@ -33,18 +33,3 @@ sudo dkp-pacman -S switch-libjson-c
 
 ### Design
 https://www.figma.com/file/BMqb2WCmluOGYmek0blxfn/ns?node-id=0%3A1
-
-### Debug
-
-```bash
-https://netease-cloud-music-api-theta-steel.vercel.app/user/playlist?uid=68277534
-```
-
-
-```bash
-https://netease-cloud-music-api-theta-steel.vercel.app/playlist/detail?id=72614739
-```
-
-```bash
-https://netease-cloud-music-api-theta-steel.vercel.app/song/url?id=1915875397
-```
