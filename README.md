@@ -19,7 +19,7 @@
   - [x] decode base64 and write to file
   - [x] render qrcode
   - [x] call check and save cookie
-  - [ ] is login
+  - [x] is login
   - [ ] logout
 
 - [ ] fetch playlist via id.
