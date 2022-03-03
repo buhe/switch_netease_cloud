@@ -24,29 +24,9 @@ const char *g_songs = NULL;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    
-    // check_msg = response_body;
-
-    // char *s;
-    // if (cookie_res == NULL)
-    // {
-    //     s = malloc(strlen(response_body) + 1);
-    //     strcpy(s, response_body);
-    //     // free(response_body);
-    // }
-    // else
-    // {
-    //     s = malloc(strlen(qr_res) + strlen(response_body) + 1);
-    //     strcpy(s, cookie_res);
-    //     strcat(s, response_body);
-    //     // free(cookie_res);
-    //     // free(response_body);
-    // }
-    // cookie_res = s;
     char tmp[STR_SIZE] = {0};
     strcpy(tmp, cookie_res);
     snprintf(cookie_res, sizeof(cookie_res), "%s%s", tmp, response_body);
-    // fetch_err = cookie_res;
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
     if(parsed_json != NULL) {
@@ -82,20 +62,11 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             }
         }
     }
-    // uint32_t response_body_len = strlen(response_body);
-    // uint32_t len = size * nmemb;
-    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    // {
-    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    // }
-    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    // char *tmp = malloc(strlen(qr_res)); 
-    // strcpy(qr_res);
     char tmp[STR_SIZE] = {0};
     strcpy(tmp, qr_res);
     snprintf(qr_res, sizeof(qr_res), "%s%s", tmp, response_body);
@@ -124,13 +95,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         }
         
     }
-    // uint32_t response_body_len = strlen(response_body);
-    // uint32_t len = size * nmemb;
-    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    // {
-    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    // }
-    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 
@@ -150,20 +114,11 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
     request(s, create_qr);
-
-    // uint32_t response_body_len = strlen(response_body);
-    // uint32_t len = size * nmemb;
-    // if (len > RESPONSE_BODY_SIZE - response_body_len - 1)
-    // {
-    //     len = RESPONSE_BODY_SIZE - response_body_len - 1;
-    // }
-    // memcpy(response_body + response_body_len, ptr, len);
     return size * nmemb;
 }
 void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
 {
     printf("url: %s\n", url);
-    // struct response chunk = {0};
     CURL *curl;
     CURLcode res;
     curl = curl_easy_init();
