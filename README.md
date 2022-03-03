@@ -26,7 +26,9 @@ sudo dkp-pacman -S switch-libjson-c
   - [x] with cookie
   - [ ] song entry
   - [ ] use cache when network lose
-- [ ] if song file not download, download it.
+- [ ] if song file not download, download it. 
+  - [ ] get song url
+  - [ ] download and save the song
 - [ ] play song via mpg123.
 
 ### Features
