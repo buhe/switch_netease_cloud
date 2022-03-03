@@ -1,1 +1,1 @@
-#define APP_DIR "song"
+// #define APP_DIR "/song"

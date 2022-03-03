@@ -22,6 +22,7 @@ void login2() {
     FILE *file = fopen(LOGIN, "wb");
     if (file != NULL)
     {
+        fprintf(file, "Login\n");
         fclose(file);
     }
 }

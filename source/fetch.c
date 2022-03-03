@@ -244,10 +244,10 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
             // reset songs res
             // strcpy(songs_res, "");
      
-            request_song(songs[i].id, songs[i]);
+            // request_song(songs[i].id, songs[i]);
             printf("id: %d\n", songs[i].id);
             printf("name: %s\n", songs[i].name);
-            printf("url: %s\n", songs[i].url);
+            // printf("url: %s\n", songs[i].url);
         }
         song_len = arraylen;
         g_songs = songs;

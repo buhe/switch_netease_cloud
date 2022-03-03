@@ -1,8 +1,8 @@
 #define STR_SIZE 200000
 
-#define QR "song/qrcode.png"
-#define W_COOKIE "song/w_cookies.txt"
-#define R_COOKIE "song/r_cookies.txt"
+#define QR "qrcode.png"
+#define W_COOKIE "w_cookies.txt"
+#define R_COOKIE "r_cookies.txt"
 
 #include "song.h"
 

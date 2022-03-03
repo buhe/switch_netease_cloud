@@ -1,4 +1,4 @@
-#define LOGIN "song/login"
+#define LOGIN "login"
 
 void logout2();
 
