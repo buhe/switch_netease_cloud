@@ -9,6 +9,7 @@
 #include "base64.h"
 #include "ui.h" 
 #include "song.h" 
+#include "account.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
@@ -47,6 +48,7 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             if (int_code == 803)
             {
                 check_msg = "login sucessful";
+                login2();
                 fetch_songs_by_playlist("72614739");
             }
         }
@@ -244,6 +246,7 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
             strcpy(s.name, str_name);
             songs[i] = s;
             printf("id: %d\n", songs[i].id);
+            printf("name: %s\n", songs[i].name);
         }
         song_len = arraylen;
         g_songs = songs;

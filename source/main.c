@@ -18,6 +18,7 @@
 #include "ui.h"
 #include "base64.h"
 #include "main.h"
+#include "account.h"
 
 #define SCREEN_W 1280
 #define SCREEN_H 720
@@ -40,6 +41,7 @@ extern char *check_msg;
 // extern char *g_songs;
 
 int check_en = 1;
+int fetch_song_en = 1;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -55,7 +57,16 @@ int main(int argc, char *argv[])
 
     
 
-    printf("curl init\n");
+    if(is_login()) {
+        printf("login\n");
+        qr_msg = "enter X fetch songs";
+        check_en = 0;
+    } else {
+        printf("try login\n");
+        login();
+    }
+
+    // printf("curl init\n");
     curl_global_init(CURL_GLOBAL_DEFAULT);
     romfsInit();
     
@@ -89,7 +100,7 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("music", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     
-    login();
+    
     // fetch_songs_by_playlist("72614739");
     // Main loop
     while (!exit_requested && appletMainLoop())
@@ -109,6 +120,15 @@ int main(int argc, char *argv[])
                     if (check_en) {
                         check();
                         check_en = 0;
+                    }
+                }
+
+                if (event.jbutton.button == JOY_X)
+                {
+                    if (fetch_song_en)
+                    {
+                        fetch_songs_by_playlist("72614739");
+                        fetch_song_en = 0;
                     }
                 }
             }
