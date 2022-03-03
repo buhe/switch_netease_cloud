@@ -24,7 +24,7 @@
 
 - [ ] fetch playlist via id.
   - [x] with cookie
-  - [ ] song entry
+  - [x] song entry
   - [ ] use cache when network lose
 - [ ] if song file not download, download it. 
   - [ ] get song url
