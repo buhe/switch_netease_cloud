@@ -19,8 +19,13 @@ sudo dkp-pacman -S switch-libjson-c
   - [x] decode base64 and write to file
   - [x] render qrcode
   - [x] call check and save cookie
+  - [ ] is login
+  - [ ] logout
 
 - [ ] fetch playlist via id.
+  - [x] api
+  - [ ] song entry
+  - [ ] use cache when network lose
 - [ ] if song file not download, download it.
 - [ ] play song via mpg123.
 
