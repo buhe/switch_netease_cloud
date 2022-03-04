@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
         if (g_songs)
         {
             SDL_Rect t4_pos = {0, 88, 0, 0};
-            start = render_list(renderer, g_songs, song_len, index, font, colors[1], colors[2], &t4_pos, 5, start);
+            start = render_list(renderer, g_songs, song_len, index, font, colors[1], colors[2], &t4_pos, 10, start);
         }
         if (display_qr)
         {

@@ -37,8 +37,8 @@ int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, co
     if (song_len < item_size) {
         item_size = song_len;
     }
-    if(start + item_size < index){
-        start = index - item_size;
+    if(start + item_size - 1 < index){
+        start = index - (item_size - 1);
     } 
     if(start > index){
         start = index;
