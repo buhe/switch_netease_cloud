@@ -15,3 +15,7 @@ typedef struct
 } Song;
 
 #endif
+
+void play2(const Song *s);
+
+void pause2(const Song *s);

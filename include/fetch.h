@@ -1,4 +1,5 @@
 #define STR_SIZE 200000
+#define S_STR_SIZE 10000
 
 #define QR "qrcode.png"
 #define W_COOKIE "w_cookies.txt"
@@ -18,6 +19,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream);
 
 size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream);
 
-void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream));
+void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream), int write_cookie);
 
-void request_song(int id, Song song);
+void request_song(const Song *song);

@@ -14,6 +14,7 @@ char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 static char qr_res[STR_SIZE] = {0};
 static char cookie_res[STR_SIZE] = {0};
 static char songs_res[STR_SIZE] = {0};
+static char url_res[S_STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
 const char *g_key = NULL;
@@ -103,10 +104,10 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
 
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
-    request(s, create_qr);
+    request(s, create_qr, 1);
     return size * nmemb;
 }
-void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream))
+void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, void *stream),int write_cookie)
 {
     printf("url: %s\n", url);
     CURL *curl;
@@ -144,10 +145,16 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     }
         
     curl_easy_cleanup(curl);
-    remove(R_COOKIE);
-    if (rename(W_COOKIE, R_COOKIE) != 0)
-    {
-        printf("rename file not successful,cause:%d\n", errno);
+    if (write_cookie) {
+        printf("write cookie\n");
+        remove(R_COOKIE);
+        if (rename(W_COOKIE, R_COOKIE) != 0)
+        {
+            printf("rename file not successful,cause:%d\n", errno);
+        }
+    } else {
+        printf("drop cookie\n");
+        remove(W_COOKIE);
     }
 }
 
@@ -196,13 +203,13 @@ void fetch_song(char *url)
 }
 
 void login() {
-    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key);
+    request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key, 1);
 }
 
 void check() {
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/login/qr/check?key=", g_key);
-    request(s, save_cookie);
+    request(s, save_cookie, 1);
 }
 
 static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
@@ -260,63 +267,71 @@ void fetch_songs_by_playlist(const char *id)
     // https://netease-cloud-music-api-theta-steel.vercel.app/playlist/detail?id=72614739
     char s[STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/playlist/detail?id=", id);
-    request(s, get_songs);
+    request(s, get_songs, 0);
 }
 static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     char *response_body = (char *)contents;
-    // char tmp[STR_SIZE] = {0};
-    // strcpy(tmp, songs_res);
-    // snprintf(songs_res, sizeof(songs_res), "%s%s", tmp, response_body);
+    // printf("res:%s\n", response_body);
+    char tmp[S_STR_SIZE] = {0};
+    strcpy(tmp, url_res);
+    snprintf(url_res, sizeof(url_res), "%s%s", tmp, response_body);
     struct json_object *parsed_json;
-    parsed_json = json_tokener_parse(response_body);
+    parsed_json = json_tokener_parse(url_res);
     if (parsed_json)
     {
-        // printf("%s", songs_res);
         struct json_object *data;
         json_object_object_get_ex(parsed_json, "data", &data);
+        struct json_object *first;
+        first = json_object_array_get_idx(data, 0);
         struct json_object *url;
-        json_object_object_get_ex(data, "url", &url);
-
-        Song *song = (Song *)userp;
-        strcpy(song->url, json_object_get_string(url));
+        json_object_object_get_ex(first, "url", &url);
+        printf("get url:%s\n", json_object_get_string(url));
+        // Song *song = (Song *)userp;
+        // strcpy(song->url, json_object_get_string(url));
     }
     return realsize;
 }
 
-void request_song(int id, Song song) {
+void request_song(const Song *song) {
     char url[STR_SIZE] = {0};
-    snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", id);
-    printf("url: %s\n", url);
-    CURL *curl;
-    CURLcode res;
-    curl = curl_easy_init();
-    if (curl == NULL)
-    {
-        return;
-    }
-
-    struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, "Accept: application/json");
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-    headers = curl_slist_append(headers, "charset: utf-8");
-
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_url);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
-
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&song);
-
-    curl_easy_setopt(curl, CURLOPT_COOKIEFILE, R_COOKIE);
-
-    res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
-    {
-        const char *err = curl_easy_strerror(res);
-        printf("curl_easy_perform() failed: %s\n", err);
-    }
+    snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
+    url_res[0] = 0;
+    request(url, get_url, 0);
 }
+//     char url[STR_SIZE] = {0};
+//     snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
+//     printf("url: %s\n", url);
+//     CURL *curl;
+//     CURLcode res;
+//     curl = curl_easy_init();
+//     if (curl == NULL)
+//     {
+//         return;
+//     }
+
+//     struct curl_slist *headers = NULL;
+//     headers = curl_slist_append(headers, "Accept: application/json");
+//     headers = curl_slist_append(headers, "Content-Type: application/json");
+//     headers = curl_slist_append(headers, "charset: utf-8");
+
+//     curl_easy_setopt(curl, CURLOPT_URL, url);
+
+//     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+//     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+//     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_url);
+//     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+
+//     // curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)song);
+
+//     curl_easy_setopt(curl, CURLOPT_COOKIEFILE, R_COOKIE);
+
+//     res = curl_easy_perform(curl);
+//     if (res != CURLE_OK)
+//     {
+//         const char *err = curl_easy_strerror(res);
+//         printf("curl_easy_perform() failed: %s\n", err);
+//     }
+//     curl_easy_cleanup(curl);
+// }
