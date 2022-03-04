@@ -25,6 +25,7 @@
 - [ ] fetch playlist via id.
   - [x] with cookie
   - [x] song entry
+  - [x] implement list with scroll ui
   - [ ] use cache when network lose
 - [ ] if song file not download, download it. 
   - [ ] get song url
