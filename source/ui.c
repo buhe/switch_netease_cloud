@@ -61,7 +61,7 @@ int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, co
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         rect->w = surface->w;
         rect->h = surface->h;
-        rect->y = rect->y + 44 * i;
+        rect->y = rect->y + 44;
         SDL_FreeSurface(surface);
         SDL_RenderCopy(renderer, texture, NULL, rect);
         SDL_DestroyTexture(texture);
