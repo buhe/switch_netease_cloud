@@ -143,6 +143,21 @@ int main(int argc, char *argv[])
                         index = song_len - 1;
                     }
                 }
+
+                if (event.jbutton.button == JOY_A)
+                {
+                    //play
+                }
+
+                if (event.jbutton.button == JOY_B)
+                {
+                    //pause
+                }
+
+                if (event.jbutton.button == JOY_MINUS)
+                {
+                    // logout
+                }
             }
         }
         SDL_RenderClear(renderer);
