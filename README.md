@@ -30,6 +30,7 @@
 - [ ] if song file not download, download it. 
   - [ ] get song url
   - [ ] download and save the song
+  - [ ] progress ui
 - [ ] play song via mpg123.
 
 ### Features
