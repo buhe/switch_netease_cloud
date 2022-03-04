@@ -22,7 +22,7 @@
   - [x] is login
   - [ ] logout
 
-- [ ] fetch playlist via id.
+- [x] fetch playlist via id.
   - [x] with cookie
   - [x] song entry
   - [x] implement list with scroll ui
