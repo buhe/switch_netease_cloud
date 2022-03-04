@@ -19,7 +19,7 @@ const char *check_msg = NULL;
 const char *g_key = NULL;
 // const char *g_songs = NULL;
 int song_len;
-Song *g_songs;
+Song *g_songs = NULL;
 
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {

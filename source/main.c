@@ -19,6 +19,7 @@
 #include "base64.h"
 #include "main.h"
 #include "account.h"
+#include "song.h"
 
 #define SCREEN_W 1280
 #define SCREEN_H 720
@@ -36,12 +37,15 @@
 #define JOY_DOWN 15
 
 extern int display_qr;
+extern int song_len;
 extern char *qr_msg;
 extern char *check_msg;
-// extern char *g_songs;
+extern Song *g_songs;
 
 int check_en = 1;
 int fetch_song_en = 1;
+
+int start = 0;
 
 // Main program entrypoint
 int main(int argc, char *argv[])
@@ -54,6 +58,7 @@ int main(int argc, char *argv[])
     
     int wait = 25;
     int exit_requested = 0;
+    int index = 0;
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     IMG_Init(IMG_INIT_PNG);
@@ -121,6 +126,23 @@ int main(int argc, char *argv[])
                         fetch_song_en = 0;
                     }
                 }
+
+                if (event.jbutton.button == JOY_UP)
+                {
+                    index--;
+                    if (index < 0) {
+                        index = 0;
+                    }
+                }
+
+                if (event.jbutton.button == JOY_DOWN)
+                {
+                    index++;
+                    if (index >= song_len)
+                    {
+                        index = song_len - 1;
+                    }
+                }
             }
         }
         SDL_RenderClear(renderer);
@@ -136,13 +158,11 @@ int main(int argc, char *argv[])
             SDL_RenderCopy(renderer, t1, NULL, &t1_pos);
             SDL_DestroyTexture(t1);
         }
-        // if (g_songs)
-        // {
-        //     SDL_Rect t4_pos = {0, 132, 0, 0};
-        //     SDL_Texture *t4 = render_text(renderer, g_songs, font, colors[1], &t4_pos);
-        //     SDL_RenderCopy(renderer, t4, NULL, &t4_pos);
-        //     SDL_DestroyTexture(t4);
-        // }
+        if (g_songs)
+        {
+            SDL_Rect t4_pos = {0, 88, 0, 0};
+            start = render_list(renderer, g_songs, song_len, index, font, colors[1], colors[2], &t4_pos, 5, start);
+        }
         if (display_qr)
         {
             SDL_Rect qr_pos = {0, 256, 0, 0};

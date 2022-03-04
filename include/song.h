@@ -2,6 +2,9 @@
 #define playing 1
 #define paused 2
 
+#ifndef SONG
+#define SONG
+
 typedef struct
 {
     int id;
@@ -9,3 +12,5 @@ typedef struct
     char url[100];
     int status;
 } Song;
+
+#endif
