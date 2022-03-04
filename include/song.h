@@ -1,6 +1,7 @@
 #define download 0
-#define playing 1
-#define paused 2
+#define ready 1
+#define playing 2
+#define paused 3
 
 #ifndef SONG
 #define SONG
