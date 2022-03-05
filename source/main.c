@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     {
         printf("login\n");
         qr_msg = "enter X fetch songs, enter - logout";
-        // check_en = 0;
+        check_en = 0;
     }
     else
     {

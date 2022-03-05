@@ -20,7 +20,7 @@
   - [x] render qrcode
   - [x] call check and save cookie
   - [x] is login
-  - [ ] logout
+  - [x] logout
 
 - [x] fetch playlist via id.
   - [x] with cookie
