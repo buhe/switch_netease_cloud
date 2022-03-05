@@ -89,13 +89,13 @@ int main(int argc, char *argv[])
     if (is_login())
     {
         printf("login\n");
-        qr_msg = "enter X fetch songs";
+        qr_msg = "enter X fetch songs, enter - logout";
         check_en = 0;
     }
     else
     {
         printf("try login\n");
-        login();
+        show_qr();
     }
     // Main loop
     while (!exit_requested && appletMainLoop())
@@ -113,8 +113,9 @@ int main(int argc, char *argv[])
 
                 if (event.jbutton.button == JOY_Y) {
                     if (check_en) {
-                        check();
                         check_en = 0;
+                        check();
+                        check_en = 1;
                     }
                 }
 
@@ -122,8 +123,9 @@ int main(int argc, char *argv[])
                 {
                     if (fetch_song_en)
                     {
-                        fetch_songs_by_playlist("72614739");
                         fetch_song_en = 0;
+                        fetch_songs_by_playlist("72614739");
+                        fetch_song_en = 1;
                     }
                 }
 
@@ -159,6 +161,9 @@ int main(int argc, char *argv[])
                 if (event.jbutton.button == JOY_MINUS)
                 {
                     // logout
+                    logout2();
+                    check_en = 1;
+                    show_qr();
                 }
             }
         }

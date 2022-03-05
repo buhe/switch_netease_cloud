@@ -11,26 +11,48 @@
 #include "account.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
-static char qr_res[STR_SIZE] = {0};
-static char cookie_res[STR_SIZE] = {0};
-static char songs_res[STR_SIZE] = {0};
-static char url_res[S_STR_SIZE] = {0};
+// static char qr_res[S_STR_SIZE] = {0};
+// static char cookie_res[S_STR_SIZE] = {0};
+// static char songs_res[STR_SIZE] = {0};
+// static char url_res[S_STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
-const char *g_key = NULL;
+
+char *g_key = NULL;
+
+char *songs_res = NULL;
+char *qr_res = NULL;
+char *cookie_res = NULL;
+char *url_res = NULL;
 // const char *g_songs = NULL;
 int song_len;
 Song *g_songs = NULL;
 
+// int g_id;
+// const char *g_url;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    char tmp[STR_SIZE] = {0};
-    strcpy(tmp, cookie_res);
-    snprintf(cookie_res, sizeof(cookie_res), "%s%s", tmp, response_body);
+    // char tmp[S_STR_SIZE] = {0};
+    // strcpy(tmp, cookie_res);
+    // snprintf(cookie_res, sizeof(cookie_res), "%s%s", tmp, response_body);
+    if (cookie_res)
+    {
+        char *result = malloc(strlen(cookie_res) + strlen(response_body) + 1);
+        strcpy(result, cookie_res);
+        strcat(result, response_body);
+        free(cookie_res);
+        cookie_res = result;
+    }
+    else
+    {
+        cookie_res = malloc(strlen(response_body) + 1);
+        strcpy(cookie_res, response_body);
+    }
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
     if(parsed_json != NULL) {
+        free(cookie_res);
         struct json_object *code;
         json_object_object_get_ex(parsed_json, "code", &code);
         int int_code = json_object_get_int(code);
@@ -48,34 +70,58 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
             if (int_code == 803)
             {
                 check_msg = "login sucessful";
+                dispose_login_qr();
+                qr_msg = "enter X fetch songs, enter - logout";
                 login2();
-                fetch_songs_by_playlist("72614739");
+                free(g_key);
+                // fetch_songs_by_playlist("72614739");
             }
         }
+        json_object_put(parsed_json);
+        // free(g_key);
     }
     return size * nmemb;
 }
+
 size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    char tmp[STR_SIZE] = {0};
-    strcpy(tmp, qr_res);
-    snprintf(qr_res, sizeof(qr_res), "%s%s", tmp, response_body);
+    if (qr_res)
+    {
+        char *r = malloc(strlen(qr_res) + strlen(response_body) + 1);
+        // if(result == NULL){
+        // printf("song size %d\n", strlen(songs_res));
+        // printf("alloc size %d\n", strlen(songs_res) + strlen(response_body) + 1);
+        // }
+        strcpy(r, qr_res);
+        strcat(r, response_body);
+        free(qr_res);
+        qr_res = r;
+    }
+    else
+    {
+        qr_res = malloc(strlen(response_body) + 1);
+        strcpy(qr_res, response_body);
+    }
+    // char tmp[S_STR_SIZE] = {0};
+    // strcpy(tmp, qr_res);
+    // snprintf(qr_res, sizeof(qr_res), "%s%s", tmp, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
-    struct json_object *data;
-    json_object_object_get_ex(parsed_json, "data", &data);
-    struct json_object *qrimg;
-    json_object_object_get_ex(data, "qrimg", &qrimg);
-    const char *str_qrimg = json_object_get_string(qrimg);
-    
-    if (str_qrimg != NULL) {
+    if(parsed_json){
+        free(qr_res);
+        struct json_object *data;
+        json_object_object_get_ex(parsed_json, "data", &data);
+        struct json_object *qrimg;
+        json_object_object_get_ex(data, "qrimg", &qrimg);
+        const char *str_qrimg = json_object_get_string(qrimg);
         char *result = NULL;
         result = replaceWord(str_qrimg, "data:image/png;base64,", "");
         printf("decode qrimg: %s\n", result);
         // char *name = "song/qr.png";
         FILE *file = fopen(QR, "wb");
-        if(file != NULL) {
+        if (file != NULL)
+        {
             printf("create qr file\n");
             size_t output_length;
             unsigned char *png_data = base64_decode(result, strlen(result), &output_length);
@@ -84,7 +130,7 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
             show_login_qr();
             qr_msg = "Please scan qrcode..continue enter Y check";
         }
-        
+        json_object_put(parsed_json);
     }
     return size * nmemb;
 }
@@ -100,9 +146,13 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(data, "unikey", &key);
     const char *str_key = json_object_get_string(key);
 
-    g_key = str_key;
+    // g_key = str_key;
+    g_key = malloc(strlen(str_key) + 1);
+    strcpy(g_key, str_key);
+    printf("key:%s\n", g_key);
+    json_object_put(parsed_json);
 
-    char s[STR_SIZE] = {0};
+    char s[S_STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s%s", BASE_URL, "/login/qr/create?key=", str_key, "&qrimg=true");
     request(s, create_qr, 1);
     return size * nmemb;
@@ -167,27 +217,28 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 }
 
 // https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3
-void fetch_song(char *url)
+void fetch_song(int id, const char *url)
 {
     // download song
-    char *name = "/song/test.mp3";
+    char file_name[S_STR_SIZE] = {0};
+    snprintf(file_name, sizeof(file_name), "%d%s", id, ".mp3");
     CURL *curl;
     CURLcode res;
     curl = curl_easy_init();
     if (curl)
     {
         curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
         /* send all data to this function  */
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         // Add any other options here.
-        FILE *file = fopen(name, "wb");
+        FILE *file = fopen(file_name, "wb");
         if (file)
         {
 
             /* write the page body to this file handle */
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-            printf("curl_easy_perform\n");
 
             res = curl_easy_perform(curl);
 
@@ -197,17 +248,16 @@ void fetch_song(char *url)
                 printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         }
 
-        printf("cleanup\n");
         curl_easy_cleanup(curl);
     }
 }
 
-void login() {
+void show_qr() {
     request("https://netease-cloud-music-api-theta-steel.vercel.app/login/qr/key", get_key, 1);
 }
 
 void check() {
-    char s[STR_SIZE] = {0};
+    char s[S_STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/login/qr/check?key=", g_key);
     request(s, save_cookie, 1);
 }
@@ -216,14 +266,29 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     char *response_body = (char *)contents;
-    char tmp[STR_SIZE] = {0};
-    strcpy(tmp, songs_res);
-    snprintf(songs_res, sizeof(songs_res), "%s%s", tmp, response_body);
+    if(songs_res){
+        char *result = malloc(strlen(songs_res) + strlen(response_body) + 1);
+        // if(result == NULL){
+        // printf("song size %d\n", strlen(songs_res));
+        // printf("alloc size %d\n", strlen(songs_res) + strlen(response_body) + 1);
+        // }
+        strcpy(result, songs_res);
+        strcat(result, response_body);
+        free(songs_res);
+        songs_res = result;
+    }else{
+        songs_res = malloc(strlen(response_body) + 1);
+        strcpy(songs_res, response_body);
+    }
+    // concat_res(songs_res, response_body);
+        // printf("song %s\n", songs_res);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(songs_res);
+
     if (parsed_json)
     {
-        // printf("%s", songs_res);
+        printf("%s\n", songs_res);
+        free(songs_res);
         int arraylen, i;
         struct json_object *playlist;
         json_object_object_get_ex(parsed_json, "playlist", &playlist);
@@ -233,7 +298,7 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
         struct json_object *id;
         struct json_object *name;
         arraylen = json_object_array_length(tracks);
-        Song songs[arraylen];
+        Song *songs = malloc(sizeof(Song) * arraylen);
         printf("songs len:%d\n", arraylen);
         for (i = 0; i < arraylen; i++)
         {
@@ -246,7 +311,9 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
             const int int_id = json_object_get_int(id);
 
             s.id = int_id;
+            // printf("n %s \n", str_name);
             strcpy(s.name, str_name);
+            // printf("s.n %s \n", s.name);
             songs[i] = s;
             // reset songs res
             // strcpy(songs_res, "");
@@ -258,6 +325,7 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
         }
         song_len = arraylen;
         g_songs = songs;
+        json_object_put(parsed_json);
     }
     return realsize;
 }
@@ -265,7 +333,7 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
 void fetch_songs_by_playlist(const char *id)
 {
     // https://netease-cloud-music-api-theta-steel.vercel.app/playlist/detail?id=72614739
-    char s[STR_SIZE] = {0};
+    char s[S_STR_SIZE] = {0};
     snprintf(s, sizeof(s), "%s%s%s", BASE_URL, "/playlist/detail?id=", id);
     request(s, get_songs, 0);
 }
@@ -274,20 +342,44 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
     size_t realsize = size * nmemb;
     char *response_body = (char *)contents;
     // printf("res:%s\n", response_body);
-    char tmp[S_STR_SIZE] = {0};
-    strcpy(tmp, url_res);
-    snprintf(url_res, sizeof(url_res), "%s%s", tmp, response_body);
+    // char tmp[S_STR_SIZE] = {0};
+    // strcpy(tmp, url_res);
+    // snprintf(url_res, sizeof(url_res), "%s%s", tmp, response_body);
+    if (url_res)
+    {
+        char *result = malloc(strlen(url_res) + strlen(response_body) + 1);
+        strcpy(result, url_res);
+        strcat(result, response_body);
+        free(url_res);
+        url_res = result;
+    }
+    else
+    {
+        url_res = malloc(strlen(response_body) + 1);
+        strcpy(url_res, response_body);
+    }
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(url_res);
     if (parsed_json)
     {
+        free(url_res);
         struct json_object *data;
         json_object_object_get_ex(parsed_json, "data", &data);
         struct json_object *first;
         first = json_object_array_get_idx(data, 0);
         struct json_object *url;
         json_object_object_get_ex(first, "url", &url);
-        printf("get url:%s\n", json_object_get_string(url));
+        const char *str_url = json_object_get_string(url);
+        printf("get url:%s\n", str_url);
+        struct json_object *id;
+        json_object_object_get_ex(first, "id", &id);
+        int int_id = json_object_get_int(id);
+        fetch_song(int_id, str_url);
+        printf("download!!!!!!\n");
+        // g_id = int_id;
+        // g_url = str_url;
+        json_object_put(parsed_json);
+        // fetch_song(int_id, str_url);
         // Song *song = (Song *)userp;
         // strcpy(song->url, json_object_get_string(url));
     }
@@ -295,9 +387,9 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
 }
 
 void request_song(const Song *song) {
-    char url[STR_SIZE] = {0};
+    char url[S_STR_SIZE] = {0};
     snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
-    url_res[0] = 0;
+    // url_res[0] = 0;
     request(url, get_url, 0);
 }
 //     char url[STR_SIZE] = {0};

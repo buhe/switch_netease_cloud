@@ -6,6 +6,11 @@ void show_login_qr()
 {
     display_qr = 1;
 }
+
+void dispose_login_qr()
+{
+    display_qr = 0;
+}
 SDL_Texture *render_image(SDL_Renderer *renderer, const char *path, SDL_Rect *rect)
 {
     SDL_Surface *surface;
@@ -46,9 +51,11 @@ int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, co
     int i, phy_index;
     for (i = 0; i < item_size; i++)
     {
+        
         SDL_Surface *surface;
         SDL_Texture *texture;
         phy_index = start + i;
+        // printf("song item %s phy_index %d\n", song[phy_index].name, phy_index);
 
         if (phy_index == index) {
             // color.a = 255;
