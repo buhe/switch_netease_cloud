@@ -11,10 +11,6 @@
 #include "account.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
-// static char qr_res[S_STR_SIZE] = {0};
-// static char cookie_res[S_STR_SIZE] = {0};
-// static char songs_res[STR_SIZE] = {0};
-// static char url_res[S_STR_SIZE] = {0};
 const char *qr_msg = NULL;
 const char *check_msg = NULL;
 
@@ -24,18 +20,13 @@ char *songs_res = NULL;
 char *qr_res = NULL;
 char *cookie_res = NULL;
 char *url_res = NULL;
-// const char *g_songs = NULL;
+
 int song_len;
 Song *g_songs = NULL;
 
-// int g_id;
-// const char *g_url;
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
-    // char tmp[S_STR_SIZE] = {0};
-    // strcpy(tmp, cookie_res);
-    // snprintf(cookie_res, sizeof(cookie_res), "%s%s", tmp, response_body);
     if (cookie_res)
     {
         char *result = malloc(strlen(cookie_res) + strlen(response_body) + 1);
@@ -74,11 +65,9 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
                 qr_msg = "enter X fetch songs, enter - logout";
                 login2();
                 free(g_key);
-                // fetch_songs_by_playlist("72614739");
             }
         }
         json_object_put(parsed_json);
-        // free(g_key);
     }
     return size * nmemb;
 }
@@ -89,10 +78,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     if (qr_res)
     {
         char *r = malloc(strlen(qr_res) + strlen(response_body) + 1);
-        // if(result == NULL){
-        // printf("song size %d\n", strlen(songs_res));
-        // printf("alloc size %d\n", strlen(songs_res) + strlen(response_body) + 1);
-        // }
         strcpy(r, qr_res);
         strcat(r, response_body);
         free(qr_res);
@@ -103,9 +88,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         qr_res = malloc(strlen(response_body) + 1);
         strcpy(qr_res, response_body);
     }
-    // char tmp[S_STR_SIZE] = {0};
-    // strcpy(tmp, qr_res);
-    // snprintf(qr_res, sizeof(qr_res), "%s%s", tmp, response_body);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
     if(parsed_json){
@@ -118,7 +100,6 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
         char *result = NULL;
         result = replaceWord(str_qrimg, "data:image/png;base64,", "");
         printf("decode qrimg: %s\n", result);
-        // char *name = "song/qr.png";
         FILE *file = fopen(QR, "wb");
         if (file != NULL)
         {
@@ -146,7 +127,6 @@ size_t get_key(void *ptr, size_t size, size_t nmemb, void *stream)
     json_object_object_get_ex(data, "unikey", &key);
     const char *str_key = json_object_get_string(key);
 
-    // g_key = str_key;
     g_key = malloc(strlen(str_key) + 1);
     strcpy(g_key, str_key);
     printf("key:%s\n", g_key);
@@ -268,10 +248,6 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
     char *response_body = (char *)contents;
     if(songs_res){
         char *result = malloc(strlen(songs_res) + strlen(response_body) + 1);
-        // if(result == NULL){
-        // printf("song size %d\n", strlen(songs_res));
-        // printf("alloc size %d\n", strlen(songs_res) + strlen(response_body) + 1);
-        // }
         strcpy(result, songs_res);
         strcat(result, response_body);
         free(songs_res);
@@ -280,8 +256,6 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
         songs_res = malloc(strlen(response_body) + 1);
         strcpy(songs_res, response_body);
     }
-    // concat_res(songs_res, response_body);
-        // printf("song %s\n", songs_res);
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(songs_res);
 
@@ -311,17 +285,10 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
             const int int_id = json_object_get_int(id);
 
             s.id = int_id;
-            // printf("n %s \n", str_name);
             strcpy(s.name, str_name);
-            // printf("s.n %s \n", s.name);
             songs[i] = s;
-            // reset songs res
-            // strcpy(songs_res, "");
-     
-            // request_song(songs[i].id, songs[i]);
             printf("id: %d\n", songs[i].id);
             printf("name: %s\n", songs[i].name);
-            // printf("url: %s\n", songs[i].url);
         }
         song_len = arraylen;
         g_songs = songs;
@@ -341,10 +308,6 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
     char *response_body = (char *)contents;
-    // printf("res:%s\n", response_body);
-    // char tmp[S_STR_SIZE] = {0};
-    // strcpy(tmp, url_res);
-    // snprintf(url_res, sizeof(url_res), "%s%s", tmp, response_body);
     if (url_res)
     {
         char *result = malloc(strlen(url_res) + strlen(response_body) + 1);
@@ -376,12 +339,7 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
         int int_id = json_object_get_int(id);
         fetch_song(int_id, str_url);
         printf("download!!!!!!\n");
-        // g_id = int_id;
-        // g_url = str_url;
         json_object_put(parsed_json);
-        // fetch_song(int_id, str_url);
-        // Song *song = (Song *)userp;
-        // strcpy(song->url, json_object_get_string(url));
     }
     return realsize;
 }
@@ -389,41 +347,5 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
 void request_song(const Song *song) {
     char url[S_STR_SIZE] = {0};
     snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
-    // url_res[0] = 0;
     request(url, get_url, 0);
 }
-//     char url[STR_SIZE] = {0};
-//     snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
-//     printf("url: %s\n", url);
-//     CURL *curl;
-//     CURLcode res;
-//     curl = curl_easy_init();
-//     if (curl == NULL)
-//     {
-//         return;
-//     }
-
-//     struct curl_slist *headers = NULL;
-//     headers = curl_slist_append(headers, "Accept: application/json");
-//     headers = curl_slist_append(headers, "Content-Type: application/json");
-//     headers = curl_slist_append(headers, "charset: utf-8");
-
-//     curl_easy_setopt(curl, CURLOPT_URL, url);
-
-//     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-//     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
-//     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_url);
-//     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
-
-//     // curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)song);
-
-//     curl_easy_setopt(curl, CURLOPT_COOKIEFILE, R_COOKIE);
-
-//     res = curl_easy_perform(curl);
-//     if (res != CURLE_OK)
-//     {
-//         const char *err = curl_easy_strerror(res);
-//         printf("curl_easy_perform() failed: %s\n", err);
-//     }
-//     curl_easy_cleanup(curl);
-// }

@@ -55,16 +55,13 @@ int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, co
         SDL_Surface *surface;
         SDL_Texture *texture;
         phy_index = start + i;
-        // printf("song item %s phy_index %d\n", song[phy_index].name, phy_index);
 
         if (phy_index == index) {
-            // color.a = 255;
             surface = TTF_RenderUTF8_Solid(font, song[phy_index].name, selected_color);
         } else{
             surface = TTF_RenderUTF8_Solid(font, song[phy_index].name, color);
         }
 
-        
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         rect->w = surface->w;
         rect->h = surface->h;
