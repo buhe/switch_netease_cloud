@@ -43,7 +43,11 @@ size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(cookie_res);
     if(parsed_json != NULL) {
-        free(cookie_res);
+        if(cookie_res){
+            free(cookie_res);
+            cookie_res = NULL;
+        }
+        
         struct json_object *code;
         json_object_object_get_ex(parsed_json, "code", &code);
         int int_code = json_object_get_int(code);
@@ -91,7 +95,10 @@ size_t create_qr(void *ptr, size_t size, size_t nmemb, void *stream)
     struct json_object *parsed_json;
     parsed_json = json_tokener_parse(qr_res);
     if(parsed_json){
-        free(qr_res);
+        if(qr_res){
+            free(qr_res);
+            qr_res = NULL;
+        }
         struct json_object *data;
         json_object_object_get_ex(parsed_json, "data", &data);
         struct json_object *qrimg;
@@ -261,8 +268,10 @@ static size_t get_songs(void *contents, size_t size, size_t nmemb, void *userp)
 
     if (parsed_json)
     {
-        printf("%s\n", songs_res);
-        free(songs_res);
+        if(songs_res){
+            free(songs_res);
+            songs_res = NULL;
+        }
         int arraylen, i;
         struct json_object *playlist;
         json_object_object_get_ex(parsed_json, "playlist", &playlist);
@@ -325,7 +334,10 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
     parsed_json = json_tokener_parse(url_res);
     if (parsed_json)
     {
-        free(url_res);
+        if(url_res){
+            free(url_res);
+            url_res = NULL;
+        }
         struct json_object *data;
         json_object_object_get_ex(parsed_json, "data", &data);
         struct json_object *first;
