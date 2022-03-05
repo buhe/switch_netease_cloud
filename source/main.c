@@ -149,13 +149,13 @@ int main(int argc, char *argv[])
                 if (event.jbutton.button == JOY_A)
                 {
                     //play
-                    play2(&g_songs[index]);
+                    play2(&g_songs[start + index]);
                 }
 
                 if (event.jbutton.button == JOY_B)
                 {
                     //pause
-                    pause2(&g_songs[index]);
+                    pause2(&g_songs[start + index]);
                 }
 
                 if (event.jbutton.button == JOY_MINUS)

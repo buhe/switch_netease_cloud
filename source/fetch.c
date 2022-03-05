@@ -196,12 +196,12 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
 }
 
 
-static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
-{
-    // stream is user defined file
-    size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
-    return written;
-}
+// static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
+// {
+//     // stream is user defined file
+//     size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+//     return written;
+// }
 
 // https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3
 void fetch_song(int id, const char *url)
@@ -218,7 +218,7 @@ void fetch_song(int id, const char *url)
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
         /* send all data to this function  */
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         // Add any other options here.
         FILE *file = fopen(file_name, "wb");
         if (file)
