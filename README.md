@@ -27,9 +27,10 @@
   - [x] song entry
   - [x] implement list with scroll ui
   - [ ] use cache when network lose
-- [ ] if song file not download, download it. 
+- [ ] download song. 
   - [x] get song url
   - [x] download and save the song
+  - [ ] if song file not download
   - [ ] progress ui
 - [x] play song via mpg123.
 
