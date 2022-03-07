@@ -53,7 +53,7 @@ APP_AUTHOR  := buhe
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
-			$(ARCH) $(DEFINES) `curl-config --cflags` `$(PREFIX)pkg-config --cflags sdl2 SDL2_image` 
+			$(ARCH) $(DEFINES) `curl-config --cflags` `$(PREFIX)pkg-config --cflags sdl2 SDL2_image SDL2_mixer` 
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
@@ -62,7 +62,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= `$(PREFIX)pkg-config --libs sdl2 SDL2_image SDL2_ttf` `curl-config --libs` -lmpg123 -lpng -ljpeg -lnx -ljson-c
+LIBS	:= `$(PREFIX)pkg-config --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer` `curl-config --libs` -lmpg123 -lpng -ljpeg -lnx -ljson-c
 
 #-------------------------------------------------------- -------------------------
 # list of directories containing libraries, this must be the top level containing

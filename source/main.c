@@ -13,6 +13,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL_mixer.h>
 
 #include "fetch.h"
 #include "ui.h"
@@ -60,8 +61,13 @@ int main(int argc, char *argv[])
     int exit_requested = 0;
     int index = 0;
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     IMG_Init(IMG_INIT_PNG);
+    Mix_Init(MIX_INIT_MP3);
+
+    // open 44.1KHz, signed 16bit, system byte order,
+    //  stereo audio, using 4096 byte chunks
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096);
     TTF_Init();
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -149,13 +155,13 @@ int main(int argc, char *argv[])
                 if (event.jbutton.button == JOY_A)
                 {
                     //play
-                    play2(&g_songs[start + index]);
+                    play2(&g_songs[index]);
                 }
 
                 if (event.jbutton.button == JOY_B)
                 {
                     //pause
-                    pause2(&g_songs[start + index]);
+                    pause2(&g_songs[index]);
                 }
 
                 if (event.jbutton.button == JOY_MINUS)
