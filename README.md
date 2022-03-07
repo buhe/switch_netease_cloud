@@ -3,11 +3,11 @@
 2. setup dev tools
     ```
     sudo dkp-pacman -S switch-dev
-
+    
     sudo dkp-pacman -S switch-curl
-
+    
     sudo dkp-pacman -S devkitA64 switch-tools switch-curl switch-bzip2 switch-freetype switch-libjpeg-turbo switch-sdl2 switch-sdl2_gfx switch-sdl2_image switch-sdl2_ttf switch-zlib switch-libpng
-
+    
     sudo dkp-pacman -S switch-libjson-c
     ```
 ### NetLoad
@@ -29,9 +29,9 @@
   - [ ] use cache when network lose
 - [ ] if song file not download, download it. 
   - [x] get song url
-  - [ ] download and save the song
+  - [x] download and save the song
   - [ ] progress ui
-- [ ] play song via mpg123.
+- [x] play song via mpg123.
 
 ### Features
 - play or pause.
@@ -42,3 +42,14 @@
 
 ### Design
 https://www.figma.com/file/BMqb2WCmluOGYmek0blxfn/ns?node-id=0%3A1
+
+### ScreenShot
+
+![WechatIMG7611](https://tva1.sinaimg.cn/large/e6c9d24egy1h015i8n3zqj20u01hc0w1.jpg)
+
+
+
+![WechatIMG7611](https://tva1.sinaimg.cn/large/e6c9d24egy1h015hrtjvtj20u01hc0wf.jpg)
+
+
+
