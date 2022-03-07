@@ -10,6 +10,9 @@
     
     sudo dkp-pacman -S switch-libjson-c
     ```
+
+### Access full RAM
+- Hold r button click any app access full RAM.
 ### NetLoad
 1. open the hbmenu and press the Y button.
 2. ```make load```
