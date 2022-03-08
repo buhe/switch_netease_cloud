@@ -37,6 +37,28 @@ SDL_Texture *render_text(SDL_Renderer *renderer, const char *text, TTF_Font *fon
     return texture;
 }
 
+void render_progress(SDL_Renderer *renderer, const float progress, TTF_Font *font, SDL_Color color, SDL_Color b_color, SDL_Rect *rect)
+{
+    // printf("renderer list\n");
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawRect(renderer, rect);
+    SDL_SetRenderDrawColor(renderer, b_color.r, b_color.g, b_color.b, b_color.a);
+    SDL_Surface *surface;
+    SDL_Texture *texture;
+    char text[100] = {0};
+    snprintf(text, sizeof(text), "%3.0f%%", progress);
+    surface = TTF_RenderUTF8_Solid(font, text, color);
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    rect->x = rect->w / 2 + rect->x - 44;
+    rect->w = surface->w;
+    rect->h = surface->h;
+
+    SDL_FreeSurface(surface);
+
+    SDL_RenderCopy(renderer, texture, NULL, rect);
+    SDL_DestroyTexture(texture);
+}
+
 int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, const int index, TTF_Font *font, SDL_Color color, SDL_Color selected_color, SDL_Rect *rect, int item_size, int start)
 {
     if (song_len < item_size) {
@@ -65,9 +87,10 @@ int render_list(SDL_Renderer *renderer, const Song *song, const int song_len, co
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         rect->w = surface->w;
         rect->h = surface->h;
-        rect->y = rect->y + 44;
+        
         SDL_FreeSurface(surface);
         SDL_RenderCopy(renderer, texture, NULL, rect);
+        rect->y = rect->y + 44;
         SDL_DestroyTexture(texture);
     }
     return start;

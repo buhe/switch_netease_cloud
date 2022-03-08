@@ -1,4 +1,6 @@
 // #define STR_SIZE 100000
+#include <curl/curl.h>
+
 #define S_STR_SIZE 10000
 
 #define QR "qrcode.png"
@@ -24,3 +26,9 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
 void request_song(const Song *song);
 
 void fetch_song(int id, const char *url);
+
+size_t progress_callback(void *clientp,
+                                curl_off_t dltotal,
+                                curl_off_t dlnow,
+                                curl_off_t ultotal,
+                                curl_off_t ulnow);

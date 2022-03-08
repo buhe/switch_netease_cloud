@@ -42,6 +42,7 @@ extern int song_len;
 extern char *qr_msg;
 extern char *check_msg;
 extern Song *g_songs;
+extern float percent;
 
 int check_en = 1;
 int fetch_song_en = 1;
@@ -84,6 +85,7 @@ int main(int argc, char *argv[])
         {255, 255, 0, 0},   // brown
         {0, 255, 255, 0},   // cyan
         {255, 0, 255, 0},   // purple
+        {0,0,0,0},
     };
     
 
@@ -188,7 +190,7 @@ int main(int argc, char *argv[])
         }
         if (g_songs)
         {
-            SDL_Rect t4_pos = {0, 88, 0, 0};
+            SDL_Rect t4_pos = {0, 132, 0, 0};
             start = render_list(renderer, g_songs, song_len, index, font, colors[1], colors[2], &t4_pos, 10, start);
         }
         if (display_qr)
@@ -197,6 +199,10 @@ int main(int argc, char *argv[])
             SDL_Texture *qr = render_image(renderer, QR, &qr_pos);
             SDL_RenderCopy(renderer, qr, NULL, &qr_pos);
             SDL_DestroyTexture(qr);
+        }
+        if(percent > 0) {
+            SDL_Rect p_pos = {12, 88, 600, 40};
+            render_progress(renderer, percent, font, colors[1], colors[8], &p_pos);
         }
         SDL_RenderPresent(renderer);
 

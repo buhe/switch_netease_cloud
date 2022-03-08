@@ -24,6 +24,8 @@ char *url_res = NULL;
 int song_len;
 Song *g_songs = NULL;
 
+float percent = 0.0;
+
 size_t save_cookie(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     char *response_body = (char *)ptr;
@@ -168,6 +170,8 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 
     // curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
@@ -226,7 +230,9 @@ void fetch_song(int id, const char *url)
 
             /* write the page body to this file handle */
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-
+            curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
+            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+            
             res = curl_easy_perform(curl);
 
             /* close the header file */
@@ -361,3 +367,24 @@ void request_song(const Song *song) {
     snprintf(url, sizeof(url), "%s%s%d", BASE_URL, "/song/url?id=", song->id);
     request(url, get_url, 0);
 }
+
+size_t progress_callback(void *clientp,
+                                curl_off_t dltotal,
+                                curl_off_t dlnow,
+                                curl_off_t ultotal,
+                                curl_off_t ulnow)
+{
+    // struct progress *memory = (struct progress *)clientp;
+
+    /* use the values */
+    printf("DOWN: %lu of %lu\r\n",
+            (unsigned long)dlnow, (unsigned long)dltotal);
+
+    percent = (float)dlnow / (float)dltotal * 100;
+
+    printf("percent: %f\r\n", percent);
+
+    return 0; /* all is good */
+}
+
+
