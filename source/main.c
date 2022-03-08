@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
         if (check_msg) {
             SDL_Rect t2_pos = {0, 44, 0, 0};
-            SDL_Texture *t2 = render_text(renderer, check_msg, font, colors[1], &t2_pos);
+            SDL_Texture *t2 = render_text(renderer, check_msg, font, colors[3], &t2_pos);
             SDL_RenderCopy(renderer, t2, NULL, &t2_pos);
             SDL_DestroyTexture(t2);
         }
