@@ -24,7 +24,6 @@
   - [x] call check and save cookie
   - [x] is login
   - [x] logout
-
 - [x] fetch playlist via id.
   - [x] with cookie
   - [x] song entry
@@ -36,6 +35,7 @@
   - [ ] if song file not download
   - [ ] progress ui
 - [x] play song via mpg123.
+  - [ ] continue random play
 
 ### Features
 - play or pause.
@@ -45,13 +45,11 @@
 - pure sdl2
 
 ### Design
-https://www.figma.com/file/BMqb2WCmluOGYmek0blxfn/ns?node-id=0%3A1
+- [Figma](https://www.figma.com/file/BMqb2WCmluOGYmek0blxfn/ns?node-id=0%3A1)
 
 ### ScreenShot
 
 ![WechatIMG7611](https://tva1.sinaimg.cn/large/e6c9d24egy1h015i8n3zqj20u01hc0w1.jpg)
-
-
 
 ![WechatIMG7611](https://tva1.sinaimg.cn/large/e6c9d24egy1h015hrtjvtj20u01hc0wf.jpg)
 
