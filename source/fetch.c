@@ -9,6 +9,7 @@
 #include "base64.h"
 #include "ui.h"  
 #include "account.h" 
+#include "cache.h" 
 
 char *BASE_URL = "https://netease-cloud-music-api-theta-steel.vercel.app";
 const char *qr_msg = NULL;
@@ -210,38 +211,43 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
 // https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/module_example/test.mp3
 void fetch_song(int id, const char *url)
 {
-    // download song
-    char file_name[S_STR_SIZE] = {0};
-    snprintf(file_name, sizeof(file_name), "%d%s", id, ".mp3");
-    CURL *curl;
-    CURLcode res;
-    curl = curl_easy_init();
-    if (curl)
-    {
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
-        /* send all data to this function  */
-        // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-        // Add any other options here.
-        FILE *file = fopen(file_name, "wb");
-        if (file)
+    if(song_cache(id)){
+        printf("%d has download.", id);
+        return;
+    } else {
+        // download song
+        char file_name[S_STR_SIZE] = {0};
+        snprintf(file_name, sizeof(file_name), "%d%s", id, ".mp3");
+        CURL *curl;
+        CURLcode res;
+        curl = curl_easy_init();
+        if (curl)
         {
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+            /* send all data to this function  */
+            // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+            // Add any other options here.
+            FILE *file = fopen(file_name, "wb");
+            if (file)
+            {
 
-            /* write the page body to this file handle */
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-            curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
-            curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-            
-            res = curl_easy_perform(curl);
+                /* write the page body to this file handle */
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+                curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
+                curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 
-            /* close the header file */
-            fclose(file);
-            if (res != CURLE_OK)
-                printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+                res = curl_easy_perform(curl);
+
+                /* close the header file */
+                fclose(file);
+                if (res != CURLE_OK)
+                    printf("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+            }
+
+            curl_easy_cleanup(curl);
         }
-
-        curl_easy_cleanup(curl);
     }
 }
 
@@ -356,7 +362,7 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
         json_object_object_get_ex(first, "id", &id);
         int int_id = json_object_get_int(id);
         fetch_song(int_id, str_url);
-        printf("download!!!!!!\n");
+        // printf("download!!!!!!\n");
         json_object_put(parsed_json);
     }
     return realsize;

@@ -32,7 +32,7 @@
 - [x] download song. 
   - [x] get song url
   - [x] download and save the song
-  - [ ] if song file not download
+  - [x] if song file not download
   - [ ] progress ui
 - [x] play song via mpg123.
   - [ ] continue random play

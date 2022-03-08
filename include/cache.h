@@ -1,0 +1,1 @@
+int song_cache(int id);
