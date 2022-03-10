@@ -178,15 +178,11 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
         if (check_msg) {
             SDL_Rect t2_pos = {0, 44, 0, 0};
-            SDL_Texture *t2 = render_text(renderer, check_msg, font, colors[3], &t2_pos);
-            SDL_RenderCopy(renderer, t2, NULL, &t2_pos);
-            SDL_DestroyTexture(t2);
+            render_text(renderer, check_msg, font, colors[3], &t2_pos);
         }
         if (qr_msg) {
             SDL_Rect t1_pos = {0, 0, 0, 0};
-            SDL_Texture *t1 = render_text(renderer, qr_msg, font, colors[1], &t1_pos);
-            SDL_RenderCopy(renderer, t1, NULL, &t1_pos);
-            SDL_DestroyTexture(t1);
+            render_text(renderer, qr_msg, font, colors[1], &t1_pos);
         }
         if (g_songs)
         {
@@ -196,9 +192,7 @@ int main(int argc, char *argv[])
         if (display_qr)
         {
             SDL_Rect qr_pos = {0, 256, 0, 0};
-            SDL_Texture *qr = render_image(renderer, QR, &qr_pos);
-            SDL_RenderCopy(renderer, qr, NULL, &qr_pos);
-            SDL_DestroyTexture(qr);
+            render_image(renderer, QR, &qr_pos);
         }
         if(percent > 0) {
             SDL_Rect p_pos = {12, 88, 600, 40};

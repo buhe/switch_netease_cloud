@@ -11,7 +11,7 @@ void dispose_login_qr()
 {
     display_qr = 0;
 }
-SDL_Texture *render_image(SDL_Renderer *renderer, const char *path, SDL_Rect *rect)
+void render_image(SDL_Renderer *renderer, const char *path, SDL_Rect *rect)
 {
     SDL_Surface *surface;
     SDL_Texture *texture;
@@ -20,9 +20,11 @@ SDL_Texture *render_image(SDL_Renderer *renderer, const char *path, SDL_Rect *re
     rect->h = surface->h;
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
-    return texture;
+
+    SDL_RenderCopy(renderer, texture, NULL, rect);
+    SDL_DestroyTexture(texture);
 }
-SDL_Texture *render_text(SDL_Renderer *renderer, const char *text, TTF_Font *font, SDL_Color color, SDL_Rect *rect)
+void render_text(SDL_Renderer *renderer, const char *text, TTF_Font *font, SDL_Color color, SDL_Rect *rect)
 {
     SDL_Surface *surface;
     SDL_Texture *texture;
@@ -34,7 +36,8 @@ SDL_Texture *render_text(SDL_Renderer *renderer, const char *text, TTF_Font *fon
 
     SDL_FreeSurface(surface);
 
-    return texture;
+    SDL_RenderCopy(renderer, texture, NULL, rect);
+    SDL_DestroyTexture(texture);
 }
 
 void render_progress(SDL_Renderer *renderer, const float progress, TTF_Font *font, SDL_Color color, SDL_Color b_color, SDL_Rect *rect)
