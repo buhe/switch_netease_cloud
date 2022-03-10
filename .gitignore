@@ -57,3 +57,5 @@ hello_switch.nro
 .vscode/configurationCache.log
 .vscode/dryrun.log
 .vscode/targets.log
+switch_netease_cloud.nro
+switch_netease_cloud.nacp
