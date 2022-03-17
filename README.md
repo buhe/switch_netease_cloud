@@ -37,6 +37,7 @@
 - [x] play song via mpg123.
   - [x] continue play
   - [ ] played last song then play first
+- [ ] app icon
 
 ### Features
 - play or pause.
