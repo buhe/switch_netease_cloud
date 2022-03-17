@@ -48,8 +48,9 @@ int check_en = 1;
 int fetch_song_en = 1;
 
 int start = 0;
+int index_song = 0;
 
-// Main program entrypoint
+    // Main program entrypoint
 int main(int argc, char *argv[])
 {
     socketInitializeDefault();
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
     
     int wait = 25;
     int exit_requested = 0;
-    int index = 0;
+    
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     IMG_Init(IMG_INIT_PNG);
@@ -139,31 +140,31 @@ int main(int argc, char *argv[])
 
                 if (event.jbutton.button == JOY_UP)
                 {
-                    index--;
-                    if (index < 0) {
-                        index = 0;
+                    index_song--;
+                    if (index_song < 0) {
+                        index_song = 0;
                     }
                 }
 
                 if (event.jbutton.button == JOY_DOWN)
                 {
-                    index++;
-                    if (index >= song_len)
+                    index_song++;
+                    if (index_song >= song_len)
                     {
-                        index = song_len - 1;
+                        index_song = song_len - 1;
                     }
                 }
 
                 if (event.jbutton.button == JOY_A)
                 {
                     //play
-                    play2(&g_songs[index]);
+                    play2(&g_songs[index_song], play_next_song);
                 }
 
                 if (event.jbutton.button == JOY_B)
                 {
                     //pause
-                    pause2(&g_songs[index]);
+                    pause2(&g_songs[index_song]);
                 }
 
                 if (event.jbutton.button == JOY_MINUS)
@@ -187,7 +188,7 @@ int main(int argc, char *argv[])
         if (g_songs)
         {
             SDL_Rect t4_pos = {0, 132, 0, 0};
-            start = render_list(renderer, g_songs, song_len, index, font, colors[1], colors[2], &t4_pos, 10, start);
+            start = render_list(renderer, g_songs, song_len, index_song, font, colors[1], colors[2], &t4_pos, 10, start);
         }
         if (display_qr)
         {

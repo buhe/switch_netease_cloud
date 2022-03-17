@@ -35,7 +35,8 @@
   - [x] if song file not download
   - [ ] progress ui
 - [x] play song via mpg123.
-  - [ ] continue random play
+  - [x] continue play
+  - [ ] played last song then play first
 
 ### Features
 - play or pause.

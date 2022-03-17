@@ -168,9 +168,9 @@ void request(char *url, size_t (*next)(void *ptr, size_t size, size_t nmemb, voi
     // curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(payload));
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "song req");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, next);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+    // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 
@@ -224,8 +224,8 @@ void fetch_song(int id, const char *url)
         if (curl)
         {
             curl_easy_setopt(curl, CURLOPT_URL, url);
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, "libnx curl example/1.0");
+            // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1l);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "song dl");
             /* send all data to this function  */
             // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
             // Add any other options here.
@@ -357,13 +357,21 @@ static size_t get_url(void *contents, size_t size, size_t nmemb, void *userp)
         struct json_object *url;
         json_object_object_get_ex(first, "url", &url);
         const char *str_url = json_object_get_string(url);
-        printf("get url:%s\n", str_url);
+        if (str_url)
+        {
+        printf("get url:<%s>\n", str_url);
         struct json_object *id;
         json_object_object_get_ex(first, "id", &id);
         int int_id = json_object_get_int(id);
         fetch_song(int_id, str_url);
         // printf("download!!!!!!\n");
         json_object_put(parsed_json);
+        }
+        else
+        {
+            printf("current song's url is null,so play next");
+            play_next_song();
+        }
     }
     return realsize;
 }
@@ -383,12 +391,12 @@ size_t progress_callback(void *clientp,
     // struct progress *memory = (struct progress *)clientp;
 
     /* use the values */
-    printf("DOWN: %lu of %lu\r\n",
-            (unsigned long)dlnow, (unsigned long)dltotal);
+    // printf("DOWN: %lu of %lu\r\n",
+    //         (unsigned long)dlnow, (unsigned long)dltotal);
 
-    percent = (float)dlnow / (float)dltotal * 100;
+    // percent = (float)dlnow / (float)dltotal * 100;
 
-    printf("percent: %f\r\n", percent);
+    // printf("percent: %f\r\n", percent);
 
     return 0; /* all is good */
 }

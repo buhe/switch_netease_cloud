@@ -16,6 +16,8 @@ typedef struct
 
 #endif
 
-void play2(const Song *s);
+void play2(const Song *s, void (*song_finished)(void));
 
 void pause2(const Song *s);
+
+void play_next_song();
